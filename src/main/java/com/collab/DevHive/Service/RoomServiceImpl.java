@@ -1,10 +1,15 @@
 package com.collab.DevHive.Service;
 
+import com.collab.DevHive.DTO.RoomRequestDto;
 import com.collab.DevHive.DTO.RoomResponseDto;
+import com.collab.DevHive.DTO.UpdateCodeRequestDto;
 import com.collab.DevHive.Entities.Enums.RoomsStatus;
 import com.collab.DevHive.Entities.Room;
+import com.collab.DevHive.Entities.RoomParticipant;
+import com.collab.DevHive.Exceptions.ResourceNotFoundException;
 import com.collab.DevHive.Repositories.RoomParticipantRepository;
 import com.collab.DevHive.Repositories.RoomRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -21,16 +26,65 @@ public class RoomServiceImpl implements RoomService{
     private final ModelMapper mapper;
 
     @Override
-    public RoomResponseDto createRoom(String username) {
-        log.info("Creating room with username : {}",username);
+    @Transactional
+    public RoomResponseDto createRoom(RoomRequestDto dto) {
+        log.info("Creating room with username : {}",dto.getUserName());
 
        // ToDo- basically add a user by security later and instead of user name simply set the authenticated user
         Room newRoom = new Room();
-        newRoom.setCreatedBy(username);
+        newRoom.setCreatedBy(dto.getUserName());
         newRoom.setId(generateRoomId());
         newRoom.setStatus(RoomsStatus.ACTIVE);
-
-
-
+        newRoom.setCode("// Start coding");
+        RoomParticipant roomParticipant = new RoomParticipant();
+        roomParticipant.setName(dto.getUserName());
+        newRoom.addParticipant(roomParticipant);
+        roomRepository.save(newRoom);
+        log.info("Room is created  with id : {}",newRoom.getId());
+        return mapper.map(newRoom,RoomResponseDto.class);
     }
+    @Override
+    @Transactional
+    public RoomResponseDto joinRoom(RoomRequestDto dto, String roomID) {
+        Room room = roomRepository.findById(roomID)
+                .orElseThrow(
+                        ()->new ResourceNotFoundException("Room is not found with id :"+roomID)
+                );
+
+        if(room.getParticipants().size() >=2){
+            throw new RuntimeException("Room is full");
+        }
+        log.info("Joining the room with id : {}",roomID);
+        RoomParticipant roomParticipant = new RoomParticipant();
+        roomParticipant.setName(dto.getUserName());
+        room.addParticipant(roomParticipant);
+
+        if(room.getParticipants().size()==2){
+            room.setStatus(RoomsStatus.FULL);
+        }
+
+        roomRepository.save(room);
+        return mapper.map(room,RoomResponseDto.class);
+    }
+
+    @Override
+    public RoomResponseDto getRoom(String roomId) {
+
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+        return mapper.map(room,RoomResponseDto.class);
+    }
+
+
+    @Override
+    public void updateCode(String roomId, UpdateCodeRequestDto dto) {
+
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+
+        room.setCode(dto.getCode());
+
+        roomRepository.save(room);
+    }
+
 }

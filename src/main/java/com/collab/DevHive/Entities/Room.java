@@ -45,4 +45,9 @@ public class Room {
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true , fetch = FetchType.LAZY)
     private List<RoomParticipant> participants;
 
+    public void addParticipant(RoomParticipant participant){
+        participants.add(participant);
+        participant.setRoom(this);
+    }
+
 }
