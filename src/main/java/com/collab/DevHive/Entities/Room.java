@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -43,7 +44,7 @@ public class Room {
 
     //inverse side
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true , fetch = FetchType.LAZY)
-    private List<RoomParticipant> participants;
+    private List<RoomParticipant> participants =  new ArrayList<>();
 
     public void addParticipant(RoomParticipant participant){
         participants.add(participant);

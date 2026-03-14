@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("rooms")
+@RequestMapping("/rooms")
 @RequiredArgsConstructor
 public class RoomController {
 
@@ -33,13 +33,15 @@ public class RoomController {
         RoomResponseDto responseDto = service.getRoom(id);
         return ResponseEntity.ok(responseDto);
     }
-    @PatchMapping("/{roomId)/code")
-    public ResponseEntity<Void> getRoom(@PathVariable(name = "roomId") String id, @RequestBody UpdateCodeRequestDto dto) {
+
+    @PatchMapping("/{roomId}/code")
+    public ResponseEntity<Void> updateCode(@PathVariable(name = "roomId") String id, @RequestBody UpdateCodeRequestDto dto) {
         service.updateCode(id, dto);
         return ResponseEntity.noContent().build();
     }
-
-
-
+    @PatchMapping("/{roomId}/end")
+    public ResponseEntity<RoomResponseDto> endRoom(@PathVariable String roomId){
+        return ResponseEntity.ok(service.endRoom(roomId));
+    }
 
 }

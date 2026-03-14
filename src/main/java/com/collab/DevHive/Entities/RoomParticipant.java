@@ -1,9 +1,11 @@
 package com.collab.DevHive.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Fetch;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,7 +21,8 @@ public class RoomParticipant {
     private Long id;
 
     //ownner side
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "room_id" , nullable = false)
     private Room room;
 

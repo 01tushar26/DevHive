@@ -36,10 +36,12 @@ public class RoomServiceImpl implements RoomService{
         newRoom.setId(generateRoomId());
         newRoom.setStatus(RoomsStatus.ACTIVE);
         newRoom.setCode("// Start coding");
+
         RoomParticipant roomParticipant = new RoomParticipant();
         roomParticipant.setName(dto.getUserName());
         newRoom.addParticipant(roomParticipant);
-        roomRepository.save(newRoom);
+
+       newRoom= roomRepository.save(newRoom);
         log.info("Room is created  with id : {}",newRoom.getId());
         return mapper.map(newRoom,RoomResponseDto.class);
     }
@@ -54,6 +56,10 @@ public class RoomServiceImpl implements RoomService{
         if(room.getParticipants().size() >=2){
             throw new RuntimeException("Room is full");
         }
+        if(room.getStatus() == RoomsStatus.CLOSED){
+            throw new RuntimeException("Room is Closed");
+        }
+        //todo- not aloowing same name member in a smae room at a time
         log.info("Joining the room with id : {}",roomID);
         RoomParticipant roomParticipant = new RoomParticipant();
         roomParticipant.setName(dto.getUserName());
@@ -63,7 +69,7 @@ public class RoomServiceImpl implements RoomService{
             room.setStatus(RoomsStatus.FULL);
         }
 
-        roomRepository.save(room);
+       room = roomRepository.save(room);
         return mapper.map(room,RoomResponseDto.class);
     }
 
@@ -85,6 +91,18 @@ public class RoomServiceImpl implements RoomService{
         room.setCode(dto.getCode());
 
         roomRepository.save(room);
+    }
+
+    @Override
+    public RoomResponseDto endRoom(String roomId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+        if(room.getStatus() == RoomsStatus.CLOSED){
+            throw new RuntimeException("Room is already closed");
+        }
+        room.setStatus(RoomsStatus.CLOSED);
+       room = roomRepository.save(room);
+        return mapper.map(room,RoomResponseDto.class);
     }
 
 }
