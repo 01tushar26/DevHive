@@ -32,3 +32,19 @@ public class CodeSyncController {
         );
     }
 }
+
+//WebSocket endpoint:
+//ws://localhost:8080/ws
+//client → /app/*
+//server → /topic/*
+//Frontend(client) sends WebSocket message
+//      ↓
+// app/code-update
+//      ↓
+//CodeSyncController receives it
+//      ↓
+//updateCode() saves snapshot
+//      ↓
+//broadcast to /topic/room/{roomId}  (server send the message )
+//      ↓
+//all users in room receive update
