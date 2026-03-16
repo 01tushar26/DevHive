@@ -27,4 +27,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
+
+
+    
 }
