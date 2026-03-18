@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/rooms")
 @RequiredArgsConstructor
@@ -22,9 +23,15 @@ public class RoomController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
+//    @PostMapping("/{roomId}/join")
+//    public ResponseEntity<RoomResponseDto> joinRoom(@PathVariable(name = "roomId") String id, @RequestBody RoomRequestDto dto){
+//        RoomResponseDto responseDto = service.joinRoom(dto,id);
+//        return ResponseEntity.ok(responseDto);
+//    }
+
     @PostMapping("/{roomId}/join")
-    public ResponseEntity<RoomResponseDto> joinRoom(@PathVariable(name = "roomId") String id, @RequestBody RoomRequestDto dto){
-        RoomResponseDto responseDto = service.joinRoom(dto,id);
+    public ResponseEntity<RoomResponseDto> joinRoom(@PathVariable(name = "roomId") String id){
+        RoomResponseDto responseDto = service.joinRoom(id);
         return ResponseEntity.ok(responseDto);
     }
 

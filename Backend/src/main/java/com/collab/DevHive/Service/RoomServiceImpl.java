@@ -47,7 +47,7 @@ public class RoomServiceImpl implements RoomService{
     }
     @Override
     @Transactional
-    public RoomResponseDto joinRoom(RoomRequestDto dto, String roomID) {
+    public RoomResponseDto joinRoom(String roomID) {
         Room room = roomRepository.findById(roomID)
                 .orElseThrow(
                         ()->new ResourceNotFoundException("Room is not found with id :"+roomID)
@@ -62,7 +62,7 @@ public class RoomServiceImpl implements RoomService{
         //todo- not aloowing same name member in a smae room at a time
         log.info("Joining the room with id : {}",roomID);
         RoomParticipant roomParticipant = new RoomParticipant();
-        roomParticipant.setName(dto.getUserName());
+        roomParticipant.setName("Annomouys");
         room.addParticipant(roomParticipant);
 
         if(room.getParticipants().size()==2){

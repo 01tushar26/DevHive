@@ -24,22 +24,26 @@ public class CodeSyncController {
     private final RoomService roomService;
     private final RoomRepository roomRepo;
 
-    @MessageMapping("/code-update/{roomId)")
-    @SendTo("/topic/room/{roomId}")
-    public void handleCodeUpdate(@DestinationVariable  String roomId , @RequestBody CodeUpdateMessage message) {
+    @MessageMapping("/code-update/{roomId}")
+    public void handleCodeUpdate(
+            @DestinationVariable String roomId,
+            @Payload CodeUpdateMessage message
+    ) {
 
         Room room = roomRepo.findById(roomId)
-                .orElseThrow(()->new ResourceNotFoundException("Room is not find"));
-
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
 
         UpdateCodeRequestDto dto = new UpdateCodeRequestDto();
         dto.setCode(message.getCode());
 
-        // Save latest code snapshot
-        roomService.updateCode(message.getRoomId(),dto);
+        
+        roomService.updateCode(roomId, dto);
 
 
-
+        messagingTemplate.convertAndSend(
+                "/topic/room/" + roomId,
+                message
+        );
     }
 }
 
