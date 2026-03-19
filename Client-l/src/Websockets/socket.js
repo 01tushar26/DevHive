@@ -16,6 +16,15 @@ export const connectSocket = (roomId, onMessageReceived) => {
       // subscribe to room
       stompClient.subscribe(`/topic/room/${roomId}`, (message) => {
         const data = JSON.parse(message.body);
+        if(data.status == "CLOSED"){
+          
+           disconnectSocket();
+           window.location.href = 'http://localhost:5173/'; 
+           
+
+         
+        
+        }
         onMessageReceived(data);
       });
     },
@@ -38,5 +47,13 @@ export const sendCodeUpdate = (roomId, code, username = "anonymous") => {
         username,
       }),
     });
+  }
+};
+
+export const disconnectSocket = () => {
+  if (stompClient) {
+    stompClient.deactivate();
+    stompClient = null;
+    console.log("WebSocket disconnected");
   }
 };

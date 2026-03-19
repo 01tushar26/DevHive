@@ -4,10 +4,19 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from './ui/button'
 import { Field, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
+import axios from 'axios'
 
 
 const RoomEditorToolBar = ({ language, setLanguage ,roomId}) => {
+
+  async function deleteRoom() {
+
+    await axios.delete(`http://localhost:8080/api/v1/rooms/${roomId}/end`)
+    console.log("Room deleted sucessfully")
+    
+  }
    const inputRef = useRef()
+   
   function copyCode() {
   // Get the text from the code snippet element
   const link = inputRef.current.value
@@ -34,6 +43,11 @@ const RoomEditorToolBar = ({ language, setLanguage ,roomId}) => {
   
           <button className="bg-blue-600 hover:bg-blue-700 px-3 py-1 text-sm rounded text-white">
             Run
+          </button>
+          <button onClick = {()=>{
+            deleteRoom()
+          }}className="bg-blue-600 hover:bg-blue-700 px-3 py-1 text-sm rounded text-white">
+            EndSession
           </button>
           <Dialog>
     <DialogTrigger>
