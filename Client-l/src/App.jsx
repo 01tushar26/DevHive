@@ -1,0 +1,26 @@
+
+import './App.css'
+
+import { BrowserRouter, Routes ,Route } from 'react-router-dom'
+import DefaultPage from './page/default-page'
+import RoomPage from './page/room-page'
+import JoinPage from './page/join-page'
+
+function App() {
+  
+  return (
+    <>
+    <BrowserRouter>
+     <Routes>
+      <Route path='/' element = {<DefaultPage/>}></Route>
+      <Route path='/room/:roomId' element = {<RoomPage/>}></Route>
+      <Route path='/room/:roomId/join' element = {<JoinPage/>}></Route>
+
+     </Routes>
+    </BrowserRouter>
+      
+    </>
+  )
+}
+
+export default App
