@@ -39,7 +39,7 @@ public class CodeSyncController {
         
         roomService.updateCode(roomId, dto);
 
-
+       //client subscribe from that url
         messagingTemplate.convertAndSend(
                 "/topic/room/" + roomId,
                 message
@@ -62,3 +62,5 @@ public class CodeSyncController {
 //broadcast to /topic/room/{roomId}  (server send the message )
 //      ↓
 //all users in room receive update
+
+// to delete the connect used the stomp.deacticate

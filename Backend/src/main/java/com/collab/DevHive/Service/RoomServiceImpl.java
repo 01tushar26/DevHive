@@ -53,19 +53,19 @@ public class RoomServiceImpl implements RoomService{
                         ()->new ResourceNotFoundException("Room is not found with id :"+roomID)
                 );
 
-        if(room.getParticipants().size() >=2){
-            throw new RuntimeException("Room is full");
+
+        if(room.getStatus() == RoomsStatus.CLOSED || room.getStatus() == RoomsStatus.FULL){
+            throw new RuntimeException("Cannot Join the room with id"+room.getId());
         }
-        if(room.getStatus() == RoomsStatus.CLOSED){
-            throw new RuntimeException("Room is Closed");
-        }
-        //todo- not aloowing same name member in a smae room at a time
+        //todo- not aloowing same name member in a same room at a time
+
         log.info("Joining the room with id : {}",roomID);
+
         RoomParticipant roomParticipant = new RoomParticipant();
-        roomParticipant.setName("Annomouys");
+        roomParticipant.setName("Anthony");
         room.addParticipant(roomParticipant);
 
-        if(room.getParticipants().size()==2){
+        if(room.getParticipants().size()==10){
             room.setStatus(RoomsStatus.FULL);
         }
 
@@ -97,6 +97,7 @@ public class RoomServiceImpl implements RoomService{
     public RoomResponseDto endRoom(String roomId) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+
         if(room.getStatus() == RoomsStatus.CLOSED){
             throw new RuntimeException("Room is already closed");
         }

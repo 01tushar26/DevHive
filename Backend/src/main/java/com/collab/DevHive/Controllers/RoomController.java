@@ -7,6 +7,7 @@ import com.collab.DevHive.Service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:5173")
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class RoomController {
 
     private final RoomService service;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @PostMapping
     public ResponseEntity<RoomResponseDto> createRoom(@RequestBody RoomRequestDto dto){
@@ -40,15 +42,23 @@ public class RoomController {
         RoomResponseDto responseDto = service.getRoom(id);
         return ResponseEntity.ok(responseDto);
     }
-
+    // not usefull in case of wensocket it do it automatically but for future
     @PatchMapping("/{roomId}/code")
     public ResponseEntity<Void> updateCode(@PathVariable(name = "roomId") String id, @RequestBody UpdateCodeRequestDto dto) {
         service.updateCode(id, dto);
         return ResponseEntity.noContent().build();
     }
-    @PatchMapping("/{roomId}/end")
+
+    @DeleteMapping("/{roomId}/end")
     public ResponseEntity<RoomResponseDto> endRoom(@PathVariable String roomId){
-        return ResponseEntity.ok(service.endRoom(roomId));
+        RoomResponseDto responseDto = service.endRoom(roomId);
+
+        //this is to send the message to websocket connect that room has been ended pls close the connection
+        simpMessagingTemplate.convertAndSend(
+                "/topic/room/" + roomId,
+                responseDto
+        );
+        return ResponseEntity.ok(responseDto);
     }
 
 }
