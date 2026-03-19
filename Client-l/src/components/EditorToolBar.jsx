@@ -69,7 +69,7 @@ Don't worry, the session is end-to-end encrypted, and fully private. Not even ou
           <FieldLabel>
             Enter your name
           </FieldLabel>
-          <Input ref={inputRef} placeholder="tushar" type="text" required/>
+          <Input ref={inputRef} placeholder="John" type="text" required/>
         </Field>
         
         <Button onClick={()=>sendCreateRoomRequest()}>Start Session</Button>
