@@ -13,8 +13,9 @@ import axios from 'axios'
 import { Input } from './ui/input'
 import { Field, FieldLabel } from './ui/field'
 import { useNavigate } from 'react-router-dom'
+import ThemeSelector from './ThemeSelector'
 
-const EditorToolBar = ({ language, setLanguage }) => {
+const EditorToolBar = ({ language, setLanguage,theme,setTheme }) => {
   // inputRef used for get its input value ....and we used it because it did not rerender the compnent
   const inputRef =useRef()
   const navigate = useNavigate()
@@ -41,21 +42,26 @@ const EditorToolBar = ({ language, setLanguage }) => {
       }
   }
   return (
-   <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-      <h1 className="text-sm font-semibold text-white">Dev Editor</h1>
+   <div className="flex items-center justify-between px-4 py-2 bg-[#14171d] border-b border-gray-700">
+      <h1 className="text-sm font-semibold text-[#00ffaab4]">Dev Hive</h1>
 
       <div className="flex items-center gap-2">
         <LanguageSelector
           language={language}
           setLanguage={setLanguage}
         />
-
-        <button className="bg-blue-600 hover:bg-blue-700 px-3 py-1 text-sm rounded text-white">
+      
+        <ThemeSelector
+          theme={theme}
+          setTheme={setTheme}
+        />
+        
+        {/* <button className="bg-[#00ffaab4] text-black hover:bg-blue-700 px-3 py-1 text-sm rounded">
           Run
-        </button>
+        </button> */}
         <Dialog>
   <DialogTrigger>
-    <Button variant="secondary">
+    <Button className="bg-[#00ffaab4] text-black}" variant="secondary">
       Share
     </Button>
   </DialogTrigger>

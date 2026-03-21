@@ -7,7 +7,7 @@ import { Input } from './ui/input'
 import axios from 'axios'
 
 
-const RoomEditorToolBar = ({ language, setLanguage ,roomId}) => {
+const RoomEditorToolBar = ({ language, setLanguage ,roomId ,theme ,setTheme}) => {
 
   async function deleteRoom() {
 
@@ -32,26 +32,31 @@ const RoomEditorToolBar = ({ language, setLanguage ,roomId}) => {
 
   
     return (
-     <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
-        <h1 className="text-sm font-semibold text-white">Dev Editor</h1>
+     <div className="flex items-center justify-between px-4 py-2 bg-[#14171d] border-b border-gray-700">
+        <h1 className="text-sm font-semibold text-[#00ffaab4]">Dev Editor</h1>
   
         <div className="flex items-center gap-2">
           <LanguageSelector
             language={language}
             setLanguage={setLanguage}
           />
+          <ThemeSelector
+          theme={theme}
+          setTheme={setTheme}
+        />
   
-          <button className="bg-blue-600 hover:bg-blue-700 px-3 py-1 text-sm rounded text-white">
+          {/* <button className="bg-blue-600 hover:bg-blue-700 px-3 py-1 text-sm rounded text-white">
             Run
-          </button>
+          </button> */}
+
           <button onClick = {()=>{
             deleteRoom()
-          }}className="bg-blue-600 hover:bg-blue-700 px-3 py-1 text-sm rounded text-white">
+          }}className="bg-[#00ffaab4] text-black hover:bg-blue-700 px-3 py-1 text-sm rounded ">
             EndSession
           </button>
           <Dialog>
     <DialogTrigger>
-      <Button variant="secondary">
+      <Button className="bg-[#00ffaab4] text-black" variant="secondary">
         Share
       </Button>
     </DialogTrigger>

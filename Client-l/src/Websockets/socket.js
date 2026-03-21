@@ -16,9 +16,11 @@ export const connectSocket = (roomId, onMessageReceived) => {
       // subscribe to room
       stompClient.subscribe(`/topic/room/${roomId}`, (message) => {
         const data = JSON.parse(message.body);
+
         if(data.status == "CLOSED"){
           
            disconnectSocket();
+           //this will send the all the subscribed to this default page
            window.location.href = 'http://localhost:5173/'; 
            
 
@@ -49,7 +51,7 @@ export const sendCodeUpdate = (roomId, code, username = "anonymous") => {
     });
   }
 };
-
+//when you delete the room this function disconnect the websocket persistence connection
 export const disconnectSocket = () => {
   if (stompClient) {
     stompClient.deactivate();

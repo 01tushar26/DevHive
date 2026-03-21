@@ -9,6 +9,7 @@ import axios from 'axios';
 const RoomPage = () => {
     const [code, setCode] = useState("// Start coding...");
     const [language, setLanguage] = useState("javascript");
+    const [theme, setTheme] = useState("vs-dark");
 
     const {roomId } = useParams()
     const username = "Tushar"; // later auth-based
@@ -46,17 +47,20 @@ const RoomPage = () => {
   };
 
  return (
-    <div className="h-screen flex flex-col bg-gray-900">
+    <div className="h-screen flex flex-col bg-[#0e1115]">
       <RoomEditorToolBar
         language={language}
         setLanguage={setLanguage}
         roomId = {roomId}
+        theme={theme}
+        setTheme={setTheme}
       />
 
       <CodeEditor
         code={code}
         setCode={handleCodeChange}
         language={language}
+        theme={theme}
       />
     </div>)
 }
