@@ -43,11 +43,11 @@ public class RoomController {
         return ResponseEntity.ok(responseDto);
     }
     // not usefull in case of wensocket it do it automatically but for future
-    @PatchMapping("/{roomId}/code")
-    public ResponseEntity<Void> updateCode(@PathVariable(name = "roomId") String id, @RequestBody UpdateCodeRequestDto dto) {
-        service.updateCode(id, dto);
-        return ResponseEntity.noContent().build();
-    }
+//    @PatchMapping("/{roomId}/code")
+//    public ResponseEntity<Void> updateCode(@PathVariable(name = "roomId") String id, @RequestBody UpdateCodeRequestDto dto) {
+//        service.updateCode(id, dto);
+//        return ResponseEntity.noContent().build();
+//    }
 
     @DeleteMapping("/{roomId}/end")
     public ResponseEntity<RoomResponseDto> endRoom(@PathVariable String roomId){
