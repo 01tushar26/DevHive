@@ -1,6 +1,6 @@
 package com.collab.DevHive.Controllers;
 
-import com.collab.DevHive.DTO.CodeUpdateMessage;
+import com.collab.DevHive.DTO.CrdtUpdateMessage;
 import com.collab.DevHive.DTO.UpdateCodeRequestDto;
 import com.collab.DevHive.Entities.Room;
 import com.collab.DevHive.Exceptions.ResourceNotFoundException;
@@ -10,11 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @RequiredArgsConstructor
@@ -24,20 +21,15 @@ public class CodeSyncController {
     private final RoomService roomService;
     private final RoomRepository roomRepo;
 
-    @MessageMapping("/code-update/{roomId}")
+    @MessageMapping("/crdt-update/{roomId}")
     public void handleCodeUpdate(
             @DestinationVariable String roomId,
-            @Payload CodeUpdateMessage message
+            @Payload CrdtUpdateMessage message
     ) {
 
-        Room room = roomRepo.findById(roomId)
-                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
 
-        UpdateCodeRequestDto dto = new UpdateCodeRequestDto();
-        dto.setCode(message.getCode());
-
-        
-        roomService.updateCode(roomId, dto);
+        //Persist the binary Yjs state update
+        roomService.applyCrdtUpdate(roomId,message.getUpdate());
 
        //client subscribe from that url
         messagingTemplate.convertAndSend(

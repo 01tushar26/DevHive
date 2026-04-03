@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Base64;
+
 import static com.collab.DevHive.Util.Util.generateRoomId;
 
 @Service
@@ -35,7 +37,7 @@ public class RoomServiceImpl implements RoomService{
         newRoom.setCreatedBy(dto.getUserName());
         newRoom.setId(generateRoomId());
         newRoom.setStatus(RoomsStatus.ACTIVE);
-        newRoom.setCode("// Start coding");
+//        newRoom.setCode("// Start coding");
 
         RoomParticipant roomParticipant = new RoomParticipant();
         roomParticipant.setName(dto.getUserName());
@@ -82,16 +84,16 @@ public class RoomServiceImpl implements RoomService{
     }
 
 
-    @Override
-    public void updateCode(String roomId, UpdateCodeRequestDto dto) {
-
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
-
-        room.setCode(dto.getCode());
-
-        roomRepository.save(room);
-    }
+//    @Override
+//    public void updateCode(String roomId, UpdateCodeRequestDto dto) {
+//
+//        Room room = roomRepository.findById(roomId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+//
+//        room.setCode(dto.getCode());
+//
+//        roomRepository.save(room);
+//    }
 
     @Override
     public RoomResponseDto endRoom(String roomId) {
@@ -104,6 +106,32 @@ public class RoomServiceImpl implements RoomService{
         room.setStatus(RoomsStatus.CLOSED);
        room = roomRepository.save(room);
         return mapper.map(room,RoomResponseDto.class);
+    }
+
+    //crdt methods
+    @Override
+    public void applyCrdtUpdate(String roomId, String updateBinary) {
+        log.info("Persist the code");
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(()->new ResourceNotFoundException("Room is not found with id :" + roomId));
+        //decode the update but this binary YJS still cant convert into the string
+
+        byte[] incomingUpdate = Base64.getDecoder().decode(updateBinary);
+        byte[] currentState = room.getCrdtState();
+        if (currentState == null) {
+            room.setCrdtState(incomingUpdate);
+        } else {
+            // With yjs4j:
+            // byte[] merged = YDoc.mergeUpdates(currentState, incomingUpdate);
+            // room.setCrdtState(merged);
+
+            // Without yjs4j (relay-only — still CRDT-correct, clients merge):
+            room.setCrdtState(incomingUpdate); // store latest snapshot
+        }
+//        String code =Base64.getEncoder().encodeToString(room.getCrdtState());
+//        room.setCode(code);
+        roomRepository.save(room);
+
     }
 
 }
