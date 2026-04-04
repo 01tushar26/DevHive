@@ -3,7 +3,7 @@ import React from 'react'
 const LanguageSelector = ({ language, setLanguage }) => {
   return (
     <select
-      className="bg-gray-700 text-white text-sm px-2 py-1 rounded outline-none"
+      className="bg-[#00ffaab4] text-black text-sm px-2 py-1 rounded outline-none"
       value={language}
       onChange={(e) => setLanguage(e.target.value)}
     >

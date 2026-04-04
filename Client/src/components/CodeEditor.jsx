@@ -1,7 +1,7 @@
 import React from 'react'
 import { Editor } from '@monaco-editor/react'
 
-const CodeEditor = ({ code, setCode, language }) => {
+const CodeEditor = ({ code, setCode, language ,theme }) => {
   return (
     <div className="flex-1">
       <Editor
@@ -9,7 +9,7 @@ const CodeEditor = ({ code, setCode, language }) => {
         language={language}
         value={code}
         onChange={(value) => setCode(value)}
-        theme="vs-dark"
+        theme={theme}
         options={{
           fontSize: 14,
           minimap: { enabled: false },
