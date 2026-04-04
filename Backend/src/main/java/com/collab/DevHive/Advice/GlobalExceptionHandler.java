@@ -2,6 +2,7 @@ package com.collab.DevHive.Advice;
 
 import com.collab.DevHive.Exceptions.AlreadyExistException;
 import com.collab.DevHive.Exceptions.ResourceNotFoundException;
+import com.collab.DevHive.Exceptions.RoomNotAvailableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,6 +15,14 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiResponse<?>> handleNotFound(ResourceNotFoundException ex){
+
+        ApiError er= ApiError.builder().message(ex.getLocalizedMessage()).status(HttpStatus.NOT_FOUND).timestamp(Timestamp.valueOf(LocalDateTime.now())).build();
+        ApiResponse<?> res = ApiResponse.builder().error(er).time(LocalDateTime.now()).build();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+    }
+    @ExceptionHandler(RoomNotAvailableException.class)
+    public ResponseEntity<ApiResponse<?>> handleRoomNotFound(ResourceNotFoundException ex){
 
         ApiError er= ApiError.builder().message(ex.getLocalizedMessage()).status(HttpStatus.NOT_FOUND).timestamp(Timestamp.valueOf(LocalDateTime.now())).build();
         ApiResponse<?> res = ApiResponse.builder().error(er).time(LocalDateTime.now()).build();

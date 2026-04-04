@@ -32,12 +32,8 @@ public class Room {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-//    @Column(columnDefinition = "TEXT")
-//    private String code;
-
-    @Lob
-    @Column(name = "crdt_state", columnDefinition = "LONGBLOB")
-    private byte[] crdtState;
+    @Column(columnDefinition = "TEXT")
+    private String code;
 
     @Column(nullable = false)
     private String createdBy;

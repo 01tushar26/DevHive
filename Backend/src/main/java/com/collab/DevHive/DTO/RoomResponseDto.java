@@ -18,5 +18,5 @@ public class RoomResponseDto {
     private String code;
     private String createdBy;
     private RoomsStatus status;
-    private List<RoomParticipant> participants;
+    private List<ParticipantResponseDto> participants;
 }

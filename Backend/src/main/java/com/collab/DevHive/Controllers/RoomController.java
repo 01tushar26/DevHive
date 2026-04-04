@@ -1,5 +1,6 @@
 package com.collab.DevHive.Controllers;
 
+import com.collab.DevHive.DTO.JoinRoomRequestDto;
 import com.collab.DevHive.DTO.RoomRequestDto;
 import com.collab.DevHive.DTO.RoomResponseDto;
 import com.collab.DevHive.DTO.UpdateCodeRequestDto;
@@ -10,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:5173")
+
 @RestController
 @RequestMapping("/rooms")
 @RequiredArgsConstructor
@@ -32,8 +33,8 @@ public class RoomController {
 //    }
 
     @PostMapping("/{roomId}/join")
-    public ResponseEntity<RoomResponseDto> joinRoom(@PathVariable(name = "roomId") String id){
-        RoomResponseDto responseDto = service.joinRoom(id);
+    public ResponseEntity<RoomResponseDto> joinRoom(@PathVariable(name = "roomId") String id , @RequestBody JoinRoomRequestDto dto){
+        RoomResponseDto responseDto = service.joinRoom(id , dto.getUserName());
         return ResponseEntity.ok(responseDto);
     }
 
@@ -53,6 +54,7 @@ public class RoomController {
     public ResponseEntity<RoomResponseDto> endRoom(@PathVariable String roomId){
         RoomResponseDto responseDto = service.endRoom(roomId);
 
+        //this will check on socket.js while before calling disConnect socket
         //this is to send the message to websocket connect that room has been ended pls close the connection
         simpMessagingTemplate.convertAndSend(
                 "/topic/room/" + roomId,

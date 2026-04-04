@@ -1,6 +1,6 @@
 package com.collab.DevHive.Controllers;
 
-import com.collab.DevHive.DTO.CrdtUpdateMessage;
+import com.collab.DevHive.DTO.CodeUpdateMessage;
 import com.collab.DevHive.DTO.UpdateCodeRequestDto;
 import com.collab.DevHive.Entities.Room;
 import com.collab.DevHive.Exceptions.ResourceNotFoundException;
@@ -21,23 +21,28 @@ public class CodeSyncController {
     private final RoomService roomService;
     private final RoomRepository roomRepo;
 
-    @MessageMapping("/crdt-update/{roomId}")
+    @MessageMapping("/code-update/{roomId}")
     public void handleCodeUpdate(
             @DestinationVariable String roomId,
-            @Payload CrdtUpdateMessage message
+            @Payload CodeUpdateMessage message
     ) {
 
 
-        //Persist the binary Yjs state update
-        roomService.applyCrdtUpdate(roomId,message.getUpdate());
+        UpdateCodeRequestDto dto = new UpdateCodeRequestDto();
+        dto.setCode(message.getCode());
 
-       //client subscribe from that url
+
+        roomService.updateCode(roomId, dto);
+
+        //client subscribe from that url
         messagingTemplate.convertAndSend(
                 "/topic/room/" + roomId,
                 message
         );
     }
 }
+
+
 
 //WebSocket endpoint:
 //ws://localhost:8080/api/v1/ws

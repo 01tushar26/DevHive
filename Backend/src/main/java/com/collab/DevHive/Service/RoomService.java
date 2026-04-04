@@ -7,10 +7,10 @@ import com.collab.DevHive.DTO.UpdateCodeRequestDto;
 public interface RoomService {
 
     RoomResponseDto createRoom(RoomRequestDto dto);
-    RoomResponseDto joinRoom(  String roomID);
+    RoomResponseDto joinRoom(String roomID, String userName);
     RoomResponseDto getRoom(String roomID);
-//    void updateCode(String roomId, UpdateCodeRequestDto dto);
+    void updateCode(String roomId, UpdateCodeRequestDto dto);
     RoomResponseDto endRoom(String roomId);
 
-    void applyCrdtUpdate(String roomId, String update);
+
 }

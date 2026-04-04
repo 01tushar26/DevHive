@@ -20,7 +20,7 @@ public class RoomParticipant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //ownner side
+    //owner side
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "room_id" , nullable = false)

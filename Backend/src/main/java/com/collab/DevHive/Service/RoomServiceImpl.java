@@ -7,15 +7,15 @@ import com.collab.DevHive.Entities.Enums.RoomsStatus;
 import com.collab.DevHive.Entities.Room;
 import com.collab.DevHive.Entities.RoomParticipant;
 import com.collab.DevHive.Exceptions.ResourceNotFoundException;
+import com.collab.DevHive.Exceptions.RoomNotAvailableException;
 import com.collab.DevHive.Repositories.RoomParticipantRepository;
 import com.collab.DevHive.Repositories.RoomRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
-import java.util.Base64;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.collab.DevHive.Util.Util.generateRoomId;
 
@@ -23,9 +23,13 @@ import static com.collab.DevHive.Util.Util.generateRoomId;
 @Slf4j
 @RequiredArgsConstructor
 public class RoomServiceImpl implements RoomService{
-    private final RoomParticipantRepository roomParticipantRepository;
+
     private final RoomRepository roomRepository;
     private final ModelMapper mapper;
+
+    private static final int MAX_PARTICIPANTS = 10;
+    private static final int MAX_RETRY_ATTEMPTS = 3;
+
 
     @Override
     @Transactional
@@ -35,43 +39,70 @@ public class RoomServiceImpl implements RoomService{
        // ToDo- basically add a user by security later and instead of user name simply set the authenticated user
         Room newRoom = new Room();
         newRoom.setCreatedBy(dto.getUserName());
-        newRoom.setId(generateRoomId());
+
         newRoom.setStatus(RoomsStatus.ACTIVE);
-//        newRoom.setCode("// Start coding");
+        newRoom.setCode("// Start coding");
 
         RoomParticipant roomParticipant = new RoomParticipant();
         roomParticipant.setName(dto.getUserName());
         newRoom.addParticipant(roomParticipant);
 
-       newRoom= roomRepository.save(newRoom);
-        log.info("Room is created  with id : {}",newRoom.getId());
-        return mapper.map(newRoom,RoomResponseDto.class);
+        // FIX: Retry on ID collision instead of blindly saving
+        for (int attempt = 0; attempt < MAX_RETRY_ATTEMPTS; attempt++) {
+            try {
+                newRoom.setId(generateRoomId());
+                newRoom = roomRepository.save(newRoom);
+                log.info("Room created with id: {}", newRoom.getId());
+                return mapper.map(newRoom,RoomResponseDto.class);
+            } catch (DataIntegrityViolationException e) {
+                log.warn("Room ID collision on attempt {}, retrying...", attempt + 1);
+                if (attempt == MAX_RETRY_ATTEMPTS - 1) {
+                    throw new RuntimeException("Failed to generate a unique room ID after " + MAX_RETRY_ATTEMPTS + " attempts", e);
+                }
+            }
+        }
+        throw new RuntimeException("Unexpected error during room creation");
+
+
+
     }
     @Override
     @Transactional
-    public RoomResponseDto joinRoom(String roomID) {
-        Room room = roomRepository.findById(roomID)
+    public RoomResponseDto joinRoom(String roomID, String userName) {
+        Room room = roomRepository.findByIdWithLock(roomID)
                 .orElseThrow(
                         ()->new ResourceNotFoundException("Room is not found with id :"+roomID)
                 );
 
 
-        if(room.getStatus() == RoomsStatus.CLOSED || room.getStatus() == RoomsStatus.FULL){
-            throw new RuntimeException("Cannot Join the room with id"+room.getId());
+        if (room.getStatus() == RoomsStatus.CLOSED) {
+            throw new RoomNotAvailableException("Room " + roomID + " is closed");
         }
-        //todo- not aloowing same name member in a same room at a time
+        if (room.getStatus() == RoomsStatus.FULL) {
+            throw new RoomNotAvailableException("Room " + roomID + " is full");
+        }
+        // this is checked before what if two people join at same time
+        if(room.getParticipants().size()>=MAX_PARTICIPANTS){
+            room.setStatus(RoomsStatus.FULL);
+            roomRepository.save(room);
+            throw new RoomNotAvailableException("Room " + roomID + " is full");
+        }
+        //todo- not allowing same name member in a same room at a time
+
+
 
         log.info("Joining the room with id : {}",roomID);
 
         RoomParticipant roomParticipant = new RoomParticipant();
-        roomParticipant.setName("Anthony");
+        roomParticipant.setName(userName);
         room.addParticipant(roomParticipant);
-
-        if(room.getParticipants().size()==10){
+        if (room.getParticipants().size() >= MAX_PARTICIPANTS) {
             room.setStatus(RoomsStatus.FULL);
         }
 
-       room = roomRepository.save(room);
+
+
+        room = roomRepository.save(room);
         return mapper.map(room,RoomResponseDto.class);
     }
 
@@ -84,21 +115,22 @@ public class RoomServiceImpl implements RoomService{
     }
 
 
-//    @Override
-//    public void updateCode(String roomId, UpdateCodeRequestDto dto) {
-//
-//        Room room = roomRepository.findById(roomId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
-//
-//        room.setCode(dto.getCode());
-//
-//        roomRepository.save(room);
-//    }
+    @Override
+    @Transactional
+    public void updateCode(String roomId, UpdateCodeRequestDto dto) {
+
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+
+        room.setCode(dto.getCode());
+
+        roomRepository.save(room);
+    }
 
     @Override
     public RoomResponseDto endRoom(String roomId) {
         Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+                .orElseThrow(() -> new RoomNotAvailableException("Room not found"));
 
         if(room.getStatus() == RoomsStatus.CLOSED){
             throw new RuntimeException("Room is already closed");
@@ -107,31 +139,4 @@ public class RoomServiceImpl implements RoomService{
        room = roomRepository.save(room);
         return mapper.map(room,RoomResponseDto.class);
     }
-
-    //crdt methods
-    @Override
-    public void applyCrdtUpdate(String roomId, String updateBinary) {
-        log.info("Persist the code");
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(()->new ResourceNotFoundException("Room is not found with id :" + roomId));
-        //decode the update but this binary YJS still cant convert into the string
-
-        byte[] incomingUpdate = Base64.getDecoder().decode(updateBinary);
-        byte[] currentState = room.getCrdtState();
-        if (currentState == null) {
-            room.setCrdtState(incomingUpdate);
-        } else {
-            // With yjs4j:
-            // byte[] merged = YDoc.mergeUpdates(currentState, incomingUpdate);
-            // room.setCrdtState(merged);
-
-            // Without yjs4j (relay-only — still CRDT-correct, clients merge):
-            room.setCrdtState(incomingUpdate); // store latest snapshot
-        }
-//        String code =Base64.getEncoder().encodeToString(room.getCrdtState());
-//        room.setCode(code);
-        roomRepository.save(room);
-
-    }
-
 }
