@@ -3,21 +3,26 @@ package com.collab.DevHive.Service;
 import com.collab.DevHive.DTO.RoomRequestDto;
 import com.collab.DevHive.DTO.RoomResponseDto;
 import com.collab.DevHive.DTO.UpdateCodeRequestDto;
+import com.collab.DevHive.Entities.Enums.ParticipantsRoles;
 import com.collab.DevHive.Entities.Enums.RoomsStatus;
 import com.collab.DevHive.Entities.Room;
 import com.collab.DevHive.Entities.RoomParticipant;
+import com.collab.DevHive.Entities.User;
 import com.collab.DevHive.Exceptions.ResourceNotFoundException;
 import com.collab.DevHive.Exceptions.RoomNotAvailableException;
 import com.collab.DevHive.Repositories.RoomParticipantRepository;
 import com.collab.DevHive.Repositories.RoomRepository;
+import com.collab.DevHive.Util.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.collab.DevHive.Util.Util.generateRoomId;
+import static com.collab.DevHive.Util.Util.getAuthenticatedUser;
 
 @Service
 @Slf4j
@@ -34,17 +39,21 @@ public class RoomServiceImpl implements RoomService{
     @Override
     @Transactional
     public RoomResponseDto createRoom(RoomRequestDto dto) {
+        User currentUser = getAuthenticatedUser();
+
         log.info("Creating room with username : {}",dto.getUserName());
-
-       // ToDo- basically add a user by security later and instead of user name simply set the authenticated user
         Room newRoom = new Room();
-        newRoom.setCreatedBy(dto.getUserName());
+       newRoom.setOwner(currentUser);
 
+       //Todo-later in a room a user can changed its name
+        newRoom.setOwnerUsername(currentUser.getName());
         newRoom.setStatus(RoomsStatus.ACTIVE);
         newRoom.setCode("// Start coding");
 
         RoomParticipant roomParticipant = new RoomParticipant();
-        roomParticipant.setName(dto.getUserName());
+        roomParticipant.setUser(currentUser);
+        roomParticipant.setRole(ParticipantsRoles.OWNER);
+        roomParticipant.setName(currentUser.getName());
         newRoom.addParticipant(roomParticipant);
 
         // FIX: Retry on ID collision instead of blindly saving
@@ -69,6 +78,8 @@ public class RoomServiceImpl implements RoomService{
     @Override
     @Transactional
     public RoomResponseDto joinRoom(String roomID, String userName) {
+        User currentUser = getAuthenticatedUser();
+
         Room room = roomRepository.findByIdWithLock(roomID)
                 .orElseThrow(
                         ()->new ResourceNotFoundException("Room is not found with id :"+roomID)
@@ -87,15 +98,18 @@ public class RoomServiceImpl implements RoomService{
             roomRepository.save(room);
             throw new RoomNotAvailableException("Room " + roomID + " is full");
         }
-        //todo- not allowing same name member in a same room at a time
+
 
 
 
         log.info("Joining the room with id : {}",roomID);
 
         RoomParticipant roomParticipant = new RoomParticipant();
-        roomParticipant.setName(userName);
+        roomParticipant.setUser(currentUser);
+        roomParticipant.setName(currentUser.getName());
+        roomParticipant.setRole(ParticipantsRoles.EDITOR);
         room.addParticipant(roomParticipant);
+
         if (room.getParticipants().size() >= MAX_PARTICIPANTS) {
             room.setStatus(RoomsStatus.FULL);
         }
@@ -118,10 +132,19 @@ public class RoomServiceImpl implements RoomService{
     @Override
     @Transactional
     public void updateCode(String roomId, UpdateCodeRequestDto dto) {
+        User currentUser = getAuthenticatedUser();
 
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
-
+        //first check whether the user is a member of room or not
+        RoomParticipant participant = room
+                .getParticipants().stream()
+                        .filter(p->p.getUser().getId().equals(currentUser.getId()))
+                                .findFirst().orElseThrow(()->new AccessDeniedException("You re not the member of the room"));
+        //then check whether the user is Join as view only or not
+        if (participant.getRole() == ParticipantsRoles.VIEWER) {
+            throw new AccessDeniedException("Viewers cannot edit code");
+        }
         room.setCode(dto.getCode());
 
         roomRepository.save(room);
@@ -129,14 +152,29 @@ public class RoomServiceImpl implements RoomService{
 
     @Override
     public RoomResponseDto endRoom(String roomId) {
+
+        User currentUser = getAuthenticatedUser();
+
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RoomNotAvailableException("Room not found"));
-
         if(room.getStatus() == RoomsStatus.CLOSED){
             throw new RuntimeException("Room is already closed");
         }
+        //first check whether the user is a member of room or not
+        RoomParticipant participant = room
+                .getParticipants().stream()
+                .filter(p->p.getUser().getId().equals(currentUser.getId()))
+                .findFirst().orElseThrow(()->new AccessDeniedException("You re not the member of the room"));
+
+       //todo-add if the user is not the owner then it left the room
+
+        if(participant.getRole() != ParticipantsRoles.OWNER){
+            throw new AccessDeniedException("You re not the member of the room");
+        }
+
+
         room.setStatus(RoomsStatus.CLOSED);
-       room = roomRepository.save(room);
+        room = roomRepository.save(room);
         return mapper.map(room,RoomResponseDto.class);
     }
 }

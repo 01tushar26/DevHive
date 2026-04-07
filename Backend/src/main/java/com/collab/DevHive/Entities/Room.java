@@ -1,6 +1,7 @@
 package com.collab.DevHive.Entities;
 
 import com.collab.DevHive.Entities.Enums.RoomsStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,8 +36,13 @@ public class Room {
     @Column(columnDefinition = "TEXT")
     private String code;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JsonIgnore
+    @JoinColumn(name = "owner_id" , nullable = false)
+    private User owner;
+
     @Column(nullable = false)
-    private String createdBy;
+    private String ownerUsername;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
