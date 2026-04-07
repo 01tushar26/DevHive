@@ -21,9 +21,8 @@ public class RoomResponseDto {
     private LocalDateTime updatedAt;
     private String code;
     private UserDTO owner;
-    private String ownerUsername;
+//    private String ownerUsername;
     private RoomsStatus status;
-    private List<RoomParticipant> participants;
-
+    private List<ParticipantResponseDto> participants;
 
 }

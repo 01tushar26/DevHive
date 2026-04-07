@@ -41,8 +41,8 @@ public class Room {
     @JoinColumn(name = "owner_id" , nullable = false)
     private User owner;
 
-    @Column(nullable = false)
-    private String ownerUsername;
+//    @Column(nullable = false)
+//    private String ownerUsername;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

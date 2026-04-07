@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 public class ParticipantResponseDto {
 
     private Long id;
-    private Long roomId;
-    private User userId;
+    private String roomId;
+    private Long userId;
     private String name;
     private ParticipantsRoles role;
     private LocalDateTime joinedAt;

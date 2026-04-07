@@ -31,7 +31,7 @@ public class CodeSyncController {
         UpdateCodeRequestDto dto = new UpdateCodeRequestDto();
         dto.setCode(message.getCode());
 
-
+        //for persistent
         roomService.updateCode(roomId, dto);
 
         //client subscribe from that url

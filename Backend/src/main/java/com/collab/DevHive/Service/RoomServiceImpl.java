@@ -38,15 +38,15 @@ public class RoomServiceImpl implements RoomService{
 
     @Override
     @Transactional
-    public RoomResponseDto createRoom(RoomRequestDto dto) {
+    public RoomResponseDto createRoom(RoomRequestDto dto ) {
         User currentUser = getAuthenticatedUser();
 
-        log.info("Creating room with username : {}",dto.getUserName());
+        log.info("Creating room with owner : {}",dto.getUserName());
         Room newRoom = new Room();
        newRoom.setOwner(currentUser);
 
        //Todo-later in a room a user can changed its name
-        newRoom.setOwnerUsername(currentUser.getName());
+//        newRoom.setOwnerUsername(currentUser.getName());
         newRoom.setStatus(RoomsStatus.ACTIVE);
         newRoom.setCode("// Start coding");
 
@@ -132,6 +132,7 @@ public class RoomServiceImpl implements RoomService{
     @Override
     @Transactional
     public void updateCode(String roomId, UpdateCodeRequestDto dto) {
+
         User currentUser = getAuthenticatedUser();
 
         Room room = roomRepository.findById(roomId)

@@ -1,6 +1,5 @@
 package com.collab.DevHive.Controllers;
 
-import com.collab.DevHive.DTO.JoinRoomRequestDto;
 import com.collab.DevHive.DTO.RoomRequestDto;
 import com.collab.DevHive.DTO.RoomResponseDto;
 import com.collab.DevHive.DTO.UpdateCodeRequestDto;
@@ -33,7 +32,7 @@ public class RoomController {
 //    }
 
     @PostMapping("/{roomId}/join")
-    public ResponseEntity<RoomResponseDto> joinRoom(@PathVariable(name = "roomId") String id , @RequestBody JoinRoomRequestDto dto){
+    public ResponseEntity<RoomResponseDto> joinRoom(@PathVariable(name = "roomId") String id , @RequestBody RoomRequestDto dto){
         RoomResponseDto responseDto = service.joinRoom(id , dto.getUserName());
         return ResponseEntity.ok(responseDto);
     }

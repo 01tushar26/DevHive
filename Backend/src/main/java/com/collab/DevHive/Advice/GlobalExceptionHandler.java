@@ -3,8 +3,11 @@ package com.collab.DevHive.Advice;
 import com.collab.DevHive.Exceptions.AlreadyExistException;
 import com.collab.DevHive.Exceptions.ResourceNotFoundException;
 import com.collab.DevHive.Exceptions.RoomNotAvailableException;
+import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -44,5 +47,40 @@ public class GlobalExceptionHandler {
         ApiResponse<?> res = ApiResponse.builder().error(er).time(LocalDateTime.now()).build();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
+    }
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<?>> handleAuthenticationException(AuthenticationException ex) {
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .message(ex.getMessage())
+                .timestamp(Timestamp.valueOf(LocalDateTime.now()))
+                .build();
+        ApiResponse<?> res = ApiResponse.builder().error(apiError).time(LocalDateTime.now()).build();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+    }
+
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ApiResponse<?>> handleJwtException(JwtException ex) {
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .timestamp(Timestamp.valueOf(LocalDateTime.now()))
+                .message(ex.getMessage())
+                .build();
+        ApiResponse<?> res = ApiResponse.builder().error(apiError).time(LocalDateTime.now()).build();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<?>> handleAccessDeniedException(AccessDeniedException ex) {
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.FORBIDDEN)
+                .timestamp(Timestamp.valueOf(LocalDateTime.now()))
+                .message(ex.getMessage())
+                .build();
+        ApiResponse<?> res = ApiResponse.builder().error(apiError).time(LocalDateTime.now()).build();
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
     }
 }
