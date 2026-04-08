@@ -1,8 +1,6 @@
 package com.collab.DevHive.Service;
 
-import com.collab.DevHive.DTO.RoomRequestDto;
-import com.collab.DevHive.DTO.RoomResponseDto;
-import com.collab.DevHive.DTO.UpdateCodeRequestDto;
+import com.collab.DevHive.DTO.*;
 import com.collab.DevHive.Entities.Enums.ParticipantsRoles;
 import com.collab.DevHive.Entities.Enums.RoomsStatus;
 import com.collab.DevHive.Entities.Room;
@@ -43,7 +41,7 @@ public class RoomServiceImpl implements RoomService{
 
         log.info("Creating room with owner : {}",dto.getUserName());
         Room newRoom = new Room();
-       newRoom.setOwner(currentUser);
+        newRoom.setOwner(currentUser);
 
        //Todo-later in a room a user can changed its name
 //        newRoom.setOwnerUsername(currentUser.getName());
@@ -77,7 +75,7 @@ public class RoomServiceImpl implements RoomService{
     }
     @Override
     @Transactional
-    public RoomResponseDto joinRoom(String roomID, String userName) {
+    public LeaveJoinRoomResponseDto joinRoom(String roomID, String userName) {
         User currentUser = getAuthenticatedUser();
 
         Room room = roomRepository.findByIdWithLock(roomID)
@@ -117,7 +115,8 @@ public class RoomServiceImpl implements RoomService{
 
 
         room = roomRepository.save(room);
-        return mapper.map(room,RoomResponseDto.class);
+        RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_JOIN");
+        return new LeaveJoinRoomResponseDto(mapper.map(room,RoomResponseDto.class),eventDto);
     }
 
     @Override
@@ -152,6 +151,7 @@ public class RoomServiceImpl implements RoomService{
     }
 
     @Override
+    @Transactional
     public RoomResponseDto endRoom(String roomId) {
 
         User currentUser = getAuthenticatedUser();
@@ -178,4 +178,35 @@ public class RoomServiceImpl implements RoomService{
         room = roomRepository.save(room);
         return mapper.map(room,RoomResponseDto.class);
     }
+
+    @Override
+    @Transactional
+    public LeaveJoinRoomResponseDto leaveRoom(String roomId) {
+        log.info("Leaving the room with id: {}",roomId);
+        User currentUser = getAuthenticatedUser();
+        Room room = roomRepository.findById(roomId).orElseThrow(
+                ()->new ResourceNotFoundException("Room is Not found with id "+roomId)
+        );
+
+        if(room.getStatus() == RoomsStatus.CLOSED){
+            throw new RuntimeException("Room is not active");
+        }
+        //first check whether the user is a member of room or not
+        RoomParticipant participant = room.getParticipants().stream()
+                .filter(roomParticipant -> roomParticipant.getUser().getId().equals(currentUser.getId()))
+                .findFirst()
+                .orElseThrow(()->new AccessDeniedException("You are not a member of this room"));
+
+        if(participant.getRole() == ParticipantsRoles.OWNER){
+            throw new AccessDeniedException("Owner cannot leave the room. Use the end room API instead.");
+        }
+
+        room.getParticipants().remove(participant);
+        room = roomRepository.save(room);
+
+        RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_LEFT");
+        return new LeaveJoinRoomResponseDto(mapper.map(room,RoomResponseDto.class),eventDto);
+
+    }
+
 }

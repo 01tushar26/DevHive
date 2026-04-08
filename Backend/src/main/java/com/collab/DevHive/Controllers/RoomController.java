@@ -1,5 +1,6 @@
 package com.collab.DevHive.Controllers;
 
+import com.collab.DevHive.DTO.LeaveJoinRoomResponseDto;
 import com.collab.DevHive.DTO.RoomRequestDto;
 import com.collab.DevHive.DTO.RoomResponseDto;
 import com.collab.DevHive.DTO.UpdateCodeRequestDto;
@@ -33,8 +34,15 @@ public class RoomController {
 
     @PostMapping("/{roomId}/join")
     public ResponseEntity<RoomResponseDto> joinRoom(@PathVariable(name = "roomId") String id , @RequestBody RoomRequestDto dto){
-        RoomResponseDto responseDto = service.joinRoom(id , dto.getUserName());
-        return ResponseEntity.ok(responseDto);
+        LeaveJoinRoomResponseDto leaveJoinRoomResponseDto = service.joinRoom(id, dto.getUserName());
+
+        // this will to tell the left participants that that user is left the room
+        simpMessagingTemplate.convertAndSend(
+                "/topic/room/" + id,
+                leaveJoinRoomResponseDto.getEventDto()
+        );
+
+        return ResponseEntity.ok(leaveJoinRoomResponseDto.getRoomResponseDto());
     }
 
     @GetMapping("/{roomId}")
@@ -60,6 +68,19 @@ public class RoomController {
                 responseDto
         );
         return ResponseEntity.ok(responseDto);
+    }
+
+    @DeleteMapping("/{roomId}/leave")
+    public ResponseEntity<RoomResponseDto> leaveRoom(@PathVariable String roomId){
+        LeaveJoinRoomResponseDto leaveJoinRoomResponseDto = service.leaveRoom(roomId);
+
+        // this will to tell the left participants that that user is left the room
+        simpMessagingTemplate.convertAndSend(
+                "/topic/room/" + roomId,
+                leaveJoinRoomResponseDto.getEventDto()
+        );
+
+        return ResponseEntity.ok(leaveJoinRoomResponseDto.getRoomResponseDto());
     }
 
 }

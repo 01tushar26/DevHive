@@ -11,6 +11,7 @@ import com.collab.DevHive.Exceptions.ResourceNotFoundException;
 import com.collab.DevHive.Repositories.RefreshTokenRepository;
 import com.collab.DevHive.Repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -23,6 +24,7 @@ import java.security.Timestamp;
 import java.util.Date;
 import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -71,7 +73,9 @@ public class AuthService {
         return new LoginResponseDTO(user.getId(),accessToken,refreshToken);
     }
 
+    //todo- regenerate refresh token again to increse the privacy
     public LoginResponseDTO refresh(String refreshToken){
+        log.info("Refreshing the token");
         RefreshToken refreshToken1 = refreshTokenRepository.findByToken(refreshToken)
                 .orElseThrow(()->new AuthenticationServiceException("Token Does Not exist"));
 
