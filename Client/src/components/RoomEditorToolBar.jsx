@@ -13,9 +13,9 @@ const RoomEditorToolBar = ({ language, setLanguage ,roomId ,theme ,setTheme}) =>
   async function deleteRoom() {
 
     await axios.delete(`http://localhost:8080/api/v1/rooms/${roomId}/end`)
-    console.log("Room deleted sucessfully")
-    
+    console.log(`Room with id ${roomId} deleted successfully`)
   }
+
    const inputRef = useRef()
    
   function copyCode() {

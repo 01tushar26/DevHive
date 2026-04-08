@@ -11,7 +11,11 @@ const JoinPage = () => {
         if(!roomId){
           return
         }
-       const response = await axios.post(`http://localhost:8080/api/v1/rooms/${roomId}/join`)
+       const response = await axios.post(`http://localhost:8080/api/v1/rooms/${roomId}/join`,
+        {userName:"tushar"}
+       )
+       
+       console.log(response)
        if(response.status === 200){
           navigate(`/room/${response.data.data.id}`)
        }

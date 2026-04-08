@@ -17,13 +17,25 @@ export const connectSocket = (roomId, onMessageReceived) => {
       stompClient.subscribe(`/topic/room/${roomId}`, (message) => {
         const data = JSON.parse(message.body);
 
-        if(data.status == "CLOSED"){
-          
-        disconnectSocket();
-           //this will send the all the subscribed to this default page
-           window.location.href = 'http://localhost:5173/'; 
+        if (data.status === "CLOSED") {
+          // endRoom — disconnect all and redirect
+          disconnectSocket();
+          window.location.href = 'http://localhost:5173/';
+
+        } else if (data.message === "USER_LEFT") {
+          // leaveRoom — show notification, update participant list
+          console.log(`${data.userName} left the room`);
+          onMessageReceived(data);  // handle UI update in the component
+
+        } else if (data.message === "USER_JOIN") {
+          // joinRoom — show notification, update participant list
+          console.log(`${data.userName} joined the room`);
+          onMessageReceived(data);  // handle UI update in the component
+
+        } else {
+          // code update or other messages
+          onMessageReceived(data);
         }
-        onMessageReceived(data);
       });
     },
 

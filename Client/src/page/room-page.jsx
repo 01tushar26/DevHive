@@ -3,7 +3,8 @@ import React from 'react'
 import { useParams } from 'react-router-dom';
 import { useState ,useRef,useEffect} from 'react';
 import CodeEditor from '@/components/CodeEditor';
-import { connectSocket,sendCodeUpdate } from '@/Websockets/socket';
+import { connectSocket,sendCodeUpdate,disconnectSocket } from '@/Websockets/socket';
+import {toast} from "react-toastify";
 import axios from 'axios';
 
 const RoomPage = () => {
@@ -17,10 +18,23 @@ const RoomPage = () => {
   const isRemoteUpdate = useRef(false);
 
   useEffect(() => {
+
     connectSocket(roomId, (data) => {
-      isRemoteUpdate.current = true;
-      setCode(data.code);
+       if (data.message === "USER_LEFT") {
+        // setParticipants(prev => prev.filter(p => p.userId !== data.userId));
+        toast.error(`${data.userName} left the room`);  // or any notification lib
+
+    } else if (data.message === "USER_JOIN") {
+        // setParticipants(prev => [...prev, { userId: data.userId, name: data.name }]);
+        toast.success(`${data.userName} joined the room`);
+
+    } else {
+        // code update
+        isRemoteUpdate.current = true;  // 
+        setCode(data.code);
+    }
     });
+     return () => disconnectSocket();
 
   }, [roomId]);
 
