@@ -48,6 +48,10 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponseDTO> refreshToken(HttpServletRequest request){
 
+        if(request.getCookies().length == 0){
+            throw new NullPointerException("No cookies found");
+        }
+
         String refreshToken = Arrays.stream(request.getCookies())
                 .filter(p->"refreshToken".equals(p.getName()))
                 .findFirst()

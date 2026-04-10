@@ -9,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +23,7 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class JWTAuthFilter extends OncePerRequestFilter {
 
     private final JWTService jwtService;
@@ -36,6 +38,11 @@ public class JWTAuthFilter extends OncePerRequestFilter {
         try {
             final String requestTokenHeader = request.getHeader("Authorization");
             if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer")) {
+                log.info("Request URI: {} has no JWT token", request.getRequestURI());
+                filterChain.doFilter(request, response);
+                return;
+            }
+            if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
                 filterChain.doFilter(request, response);
                 return;
             }
