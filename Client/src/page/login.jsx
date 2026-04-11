@@ -1,4 +1,4 @@
-import axios from 'axios'
+
 import React from 'react'
 import { useRef } from 'react'
 import { toast } from 'sonner'
@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { useNavigate } from 'react-router-dom'
+import axiosInstance from '@/lib/axios-instance'
 
 
 function Login() {
@@ -29,7 +30,8 @@ function Login() {
         return;
      }
      try{
-      const response = await axios.post('http://localhost:8080/api/v1/auth/login',
+      
+      const response = await axiosInstance.post('/auth/login',
         {
             "email":usernameRef.current.value,
             "password":passwordRef.current.value
@@ -43,8 +45,8 @@ function Login() {
 
      }
      catch(error){
-        console.log("error",error)
-        toast.error("User/Password invalid !!")
+       const message=error.response?.data?.error?.message || "Invalid email or password";
+        toast.error(message)
 
      }
 

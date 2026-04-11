@@ -32,6 +32,10 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
         console.log("error", error);
+    
+    if (originalRequest.url.includes('/auth/')) {
+      return Promise.reject(error);
+    }
 
     if (
       (error.response?.status === 401 || error.response?.status === 403) &&
@@ -42,14 +46,15 @@ axiosInstance.interceptors.response.use(
 
       try {
         console.log("Access token expired, attempting refresh...");
-        const { data } = await axiosInstance.post('/auth/refresh');
+        const res = await axiosInstance.post('/auth/refresh');
 
-        localStorage.setItem('accessToken', data.accessToken);
-        originalRequest.headers['Authorization'] = `Bearer ${data.data.accessToken}`;
-        console.log("String",data);
-
+        localStorage.setItem('accessToken', res.data.data.accessToken);
+        originalRequest.headers['Authorization'] = `Bearer ${res.data.data.accessToken}`;
+        console.log("String",res);
         return axiosInstance(originalRequest); // retry original request
+
       } catch (err) {
+
         localStorage.removeItem('accessToken');
         toast.error("Please login first")
         window.location.href = 'http://localhost:5173/login';
