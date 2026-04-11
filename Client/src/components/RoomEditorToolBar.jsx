@@ -6,13 +6,14 @@ import { Button } from './ui/button'
 import { Field, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
 import axios from 'axios'
+import axiosInstance from '@/lib/axios-instance'
 
 
 const RoomEditorToolBar = ({ language, setLanguage ,roomId ,theme ,setTheme}) => {
 
   async function deleteRoom() {
 
-    await axios.delete(`http://localhost:8080/api/v1/rooms/${roomId}/end`)
+    await axiosInstance.delete(`/rooms/${roomId}/end`)
     console.log(`Room with id ${roomId} deleted successfully`)
   }
 

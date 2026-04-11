@@ -1,10 +1,12 @@
 import SockJS from "sockjs-client/dist/sockjs.min";
 import { Client } from "@stomp/stompjs"
+import { toast } from "sonner";
 
 let stompClient = null;
 
 export const connectSocket = (roomId, onMessageReceived) => {
   const socket = new SockJS("http://localhost:8080/api/v1/ws");
+  
 
   stompClient = new Client({
     webSocketFactory: () => socket,
@@ -24,16 +26,17 @@ export const connectSocket = (roomId, onMessageReceived) => {
 
         } else if (data.message === "USER_LEFT") {
           // leaveRoom — show notification, update participant list
-          console.log(`${data.userName} left the room`);
+          toast.success(`${data.userName} left the room`);
           onMessageReceived(data);  // handle UI update in the component
 
         } else if (data.message === "USER_JOIN") {
           // joinRoom — show notification, update participant list
-          console.log(`${data.userName} joined the room`);
+          toast.success(`${data.userName} joined the room`);
           onMessageReceived(data);  // handle UI update in the component
 
         } else {
           // code update or other messages
+          console.log('message !' , data)
           onMessageReceived(data);
         }
       });

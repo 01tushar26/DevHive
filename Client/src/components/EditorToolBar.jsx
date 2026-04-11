@@ -14,6 +14,7 @@ import { Input } from './ui/input'
 import { Field, FieldLabel } from './ui/field'
 import { useNavigate } from 'react-router-dom'
 import ThemeSelector from './ThemeSelector'
+import axiosInstance from '@/lib/axios-instance'
 
 const EditorToolBar = ({ language, setLanguage,theme,setTheme }) => {
   // inputRef used for get its input value ....and we used it because it did not rerender the compnent
@@ -27,7 +28,7 @@ const EditorToolBar = ({ language, setLanguage,theme,setTheme }) => {
           return
         }
        
-      const response =  await axios.post("http://localhost:8080/api/v1/rooms"
+      const response =  await axiosInstance.post("/rooms"
         ,{ userName: inputRef.current.value}
        )
        console.log(response)

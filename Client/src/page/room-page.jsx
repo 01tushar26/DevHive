@@ -4,8 +4,9 @@ import { useParams } from 'react-router-dom';
 import { useState ,useRef,useEffect} from 'react';
 import CodeEditor from '@/components/CodeEditor';
 import { connectSocket,sendCodeUpdate,disconnectSocket } from '@/Websockets/socket';
-import {toast} from "react-toastify";
+import { toast  } from 'sonner';
 import axios from 'axios';
+import axiosInstance from '@/lib/axios-instance';
 
 const RoomPage = () => {
     const [code, setCode] = useState("// Start coding...");
@@ -30,6 +31,7 @@ const RoomPage = () => {
 
     } else {
         // code update
+        ('updating code .....')
         isRemoteUpdate.current = true;  // 
         setCode(data.code);
     }
@@ -41,7 +43,7 @@ const RoomPage = () => {
   useEffect(()=>{
     async function getRoomCode() {
 
-      const res = await axios.get(`http://localhost:8080/api/v1/rooms/${roomId}`)
+      const res = await axiosInstance.get(`/rooms/${roomId}`)
       if(res.status === 200){
         setCode(res.data.data.code)
       }
@@ -59,6 +61,7 @@ const RoomPage = () => {
     setCode(newCode);
     sendCodeUpdate(roomId, newCode, username);
   };
+  
 
  return (
     <div className="h-screen flex flex-col bg-[#0e1115]">

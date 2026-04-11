@@ -1,3 +1,4 @@
+import axiosInstance from '@/lib/axios-instance'
 import axios from 'axios'
 import React, { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -11,7 +12,7 @@ const JoinPage = () => {
         if(!roomId){
           return
         }
-       const response = await axios.post(`http://localhost:8080/api/v1/rooms/${roomId}/join`,
+       const response = await axiosInstance.post(`/rooms/${roomId}/join`,
         {userName:"tushar"}
        )
        
