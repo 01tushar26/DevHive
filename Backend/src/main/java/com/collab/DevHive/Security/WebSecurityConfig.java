@@ -38,13 +38,14 @@ public class WebSecurityConfig {
 
         httpSecurity
                 .csrf(csrfConfig -> csrfConfig.disable())
+                //this will allow the request from frontend(avoid cors errors)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .requestMatchers("/rooms/**").authenticated()
-                                .requestMatchers("/ws/**").authenticated()
+//                                .requestMatchers("/ws/**").authenticated()
 
 //                        .requestMatchers("/users/**").authenticated()
                         .anyRequest().permitAll()

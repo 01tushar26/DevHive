@@ -41,7 +41,7 @@ public class AuthService {
         User user = userRepo.findByEmail(signUpRequestDTO.getEmail()).orElse(null);
 
         if(user != null){
-            throw new RuntimeException("User is already present with this"+ signUpRequestDTO.getEmail()+" id" );
+            throw new RuntimeException("User is already present with this '"+ signUpRequestDTO.getEmail()+"' email" );
         }
         User newUser = mapper.map(signUpRequestDTO,User.class);
         newUser.setPassword(passwordEncoder.encode(signUpRequestDTO.getPassword()));
@@ -77,7 +77,7 @@ public class AuthService {
     public LoginResponseDTO refresh(String refreshToken){
         log.info("Refreshing the token");
         RefreshToken refreshToken1 = refreshTokenRepository.findByToken(refreshToken)
-                .orElseThrow(()->new AuthenticationServiceException("Token Does Not exist"));
+                .orElseThrow(()->new AuthenticationServiceException("Token does Not exist"));
 
         if(refreshToken1.isRevoked()){
             throw new AuthenticationServiceException("Token has been revoked");
@@ -89,7 +89,7 @@ public class AuthService {
 
         // expiry or not checked by the jwt itself ??
         Long id = jwtService.getUserIdFromToken(refreshToken);
-        User user = userRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("User with id :"+id+"is not found"));
+        User user = userRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("User with id : "+id+" is not found"));
 
         String accesstoken = jwtService.generateAccessToken(user);
         return new LoginResponseDTO(user.getId(),accesstoken,refreshToken);

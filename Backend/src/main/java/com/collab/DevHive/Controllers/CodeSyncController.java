@@ -26,13 +26,14 @@ public class CodeSyncController {
             @DestinationVariable String roomId,
             @Payload CodeUpdateMessage message
     ) {
-
+      // this update method is authentivcayed
 
         UpdateCodeRequestDto dto = new UpdateCodeRequestDto();
         dto.setCode(message.getCode());
 
         //for persistent
         roomService.updateCode(roomId, dto);
+
 
         //client subscribe from that url
         messagingTemplate.convertAndSend(

@@ -132,19 +132,20 @@ public class RoomServiceImpl implements RoomService{
     @Transactional
     public void updateCode(String roomId, UpdateCodeRequestDto dto) {
 
-        User currentUser = getAuthenticatedUser();
+//        User currentUser = getAuthenticatedUser();
 
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+
         //first check whether the user is a member of room or not
-        RoomParticipant participant = room
-                .getParticipants().stream()
-                        .filter(p->p.getUser().getId().equals(currentUser.getId()))
-                                .findFirst().orElseThrow(()->new AccessDeniedException("You re not the member of the room"));
-        //then check whether the user is Join as view only or not
-        if (participant.getRole() == ParticipantsRoles.VIEWER) {
-            throw new AccessDeniedException("Viewers cannot edit code");
-        }
+//        RoomParticipant participant = room
+//                .getParticipants().stream()
+//                        .filter(p->p.getUser().getId().equals(currentUser.getId()))
+//                                .findFirst().orElseThrow(()->new AccessDeniedException("You re not the member of the room"));
+//        //then check whether the user is Join as view only or not
+//        if (participant.getRole() == ParticipantsRoles.VIEWER) {
+//            throw new AccessDeniedException("Viewers cannot edit code");
+//        }
         room.setCode(dto.getCode());
 
         roomRepository.save(room);
