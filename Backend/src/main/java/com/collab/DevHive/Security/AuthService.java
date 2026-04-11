@@ -19,10 +19,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Timestamp;
 import java.util.Date;
-import java.util.Set;
 
 @Slf4j
 @Service
@@ -38,11 +37,9 @@ public class AuthService {
 
     public UserDTO signupUser(SignUpRequestDTO signUpRequestDTO){
 
-        User user = userRepo.findByEmail(signUpRequestDTO.getEmail()).orElse(null);
-
-        if(user != null){
-            throw new RuntimeException("User is already present with this '"+ signUpRequestDTO.getEmail()+"' email" );
-        }
+       if(userRepo.existsByEmail(signUpRequestDTO.getEmail())){
+           throw new RuntimeException("User is already exist with email : "+signUpRequestDTO.getEmail());
+       }
         User newUser = mapper.map(signUpRequestDTO,User.class);
         newUser.setPassword(passwordEncoder.encode(signUpRequestDTO.getPassword()));
 
@@ -50,6 +47,7 @@ public class AuthService {
         return mapper.map(newUser,UserDTO.class);
 
     }
+    @Transactional
     public LoginResponseDTO loginUser(LoginDTO loginDTO){
 
         Authentication authentication = authenticationManager.authenticate(
@@ -58,6 +56,8 @@ public class AuthService {
 
         User user = (User) authentication.getPrincipal();
 
+        // todo-one user one login( later add session on devices)
+      refreshTokenRepository.revokeAllByUser(user);
 
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
@@ -76,8 +76,10 @@ public class AuthService {
     //todo- regenerate refresh token again to increse the privacy
     public LoginResponseDTO refresh(String refreshToken){
         log.info("Refreshing the token");
+
         RefreshToken refreshToken1 = refreshTokenRepository.findByToken(refreshToken)
-                .orElseThrow(()->new AuthenticationServiceException("Token does Not exist"));
+                .orElseThrow(()->new AuthenticationServiceException("Invalid refresh token"));
+
 
         if(refreshToken1.isRevoked()){
             throw new AuthenticationServiceException("Token has been revoked");
@@ -87,12 +89,25 @@ public class AuthService {
             throw new AuthenticationServiceException("Token expired");
         }
 
-        // expiry or not checked by the jwt itself ??
-        Long id = jwtService.getUserIdFromToken(refreshToken);
-        User user = userRepo.findById(id).orElseThrow(()-> new ResourceNotFoundException("User with id : "+id+" is not found"));
+        User user = refreshToken1.getUser();
 
-        String accesstoken = jwtService.generateAccessToken(user);
-        return new LoginResponseDTO(user.getId(),accesstoken,refreshToken);
+        refreshToken1.setRevoked(true);
+        refreshTokenRepository.save(refreshToken1);
+
+
+
+
+        String newaccesstoken = jwtService.generateAccessToken(user);
+        String newrefreshtoken = jwtService.generateRefreshToken(user);
+        RefreshToken newTokenEntity = RefreshToken.builder()
+                .token(newrefreshtoken)
+                .user(user)
+                .expiryDate(new Date(System.currentTimeMillis() +1000L * 60 * 60 * 24 * 30 * 6))
+                .revoked(false)
+                .build();
+        refreshTokenRepository.save(newTokenEntity);
+
+        return new LoginResponseDTO(user.getId(), newaccesstoken,newrefreshtoken);
 
     }
 

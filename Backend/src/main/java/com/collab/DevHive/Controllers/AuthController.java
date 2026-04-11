@@ -40,19 +40,24 @@ public class AuthController {
         Cookie cookie = new Cookie("refreshToken", loginResponseDTO.getRefreshToken());
 
         cookie.setHttpOnly(true); // Prevents client-side scripts from accessing the cookie
+        cookie.setPath("/");
+        int sixMonths = 60 * 60 * 24 * 30 * 6;
+        cookie.setMaxAge(sixMonths);
         response.addCookie(cookie);
 
         return ResponseEntity.ok(loginResponseDTO);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<LoginResponseDTO> refreshToken(HttpServletRequest request){
+    public ResponseEntity<LoginResponseDTO> refreshToken(HttpServletRequest request, HttpServletResponse response){
 
-        if(request.getCookies().length == 0){
-            throw new NullPointerException("No cookies found");
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies == null || cookies.length == 0) {
+            throw new AuthenticationServiceException("No cookies found");
         }
 
-        String refreshToken = Arrays.stream(request.getCookies())
+        String refreshToken = Arrays.stream(cookies)
                 .filter(p->"refreshToken".equals(p.getName()))
                 .findFirst()
                 .map(Cookie::getValue).
@@ -60,13 +65,26 @@ public class AuthController {
 
        LoginResponseDTO loginResponseDTO= authService.refresh(refreshToken);
 
+        Cookie cookie = new Cookie("refreshToken", loginResponseDTO.getRefreshToken());
+
+        cookie.setHttpOnly(true); // Prevents client-side scripts from accessing the cookie
+        cookie.setPath("/");
+        int sixMonths = 60 * 60 * 24 * 30 * 6;
+        cookie.setMaxAge(sixMonths);
+        response.addCookie(cookie);
+
+
         return ResponseEntity.ok(loginResponseDTO);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Boolean> logout(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null || cookies.length == 0) {
+            throw new AuthenticationServiceException("No cookies found");
+        }
 
-        String refreshToken = Arrays.stream(request.getCookies())
+        String refreshToken = Arrays.stream(cookies)
                 .filter(c -> "refreshToken".equals(c.getName()))
                 .findFirst()
                 .map(Cookie::getValue)
@@ -79,6 +97,7 @@ public class AuthController {
         // remove cookie
         Cookie cookie = new Cookie("refreshToken", null);
         cookie.setHttpOnly(true);
+        cookie.setPath("/");
         cookie.setMaxAge(0);
         response.addCookie(cookie);
 
