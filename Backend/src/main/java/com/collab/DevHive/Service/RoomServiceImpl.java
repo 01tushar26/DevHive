@@ -6,6 +6,7 @@ import com.collab.DevHive.Entities.Enums.RoomsStatus;
 import com.collab.DevHive.Entities.Room;
 import com.collab.DevHive.Entities.RoomParticipant;
 import com.collab.DevHive.Entities.User;
+import com.collab.DevHive.Exceptions.AlreadyExistException;
 import com.collab.DevHive.Exceptions.ResourceNotFoundException;
 import com.collab.DevHive.Exceptions.RoomNotAvailableException;
 import com.collab.DevHive.Repositories.RoomParticipantRepository;
@@ -83,10 +84,23 @@ public class RoomServiceImpl implements RoomService{
                         ()->new ResourceNotFoundException("Room is not found with id :"+roomID)
                 );
 
-
         if (room.getStatus() == RoomsStatus.CLOSED) {
             throw new RoomNotAvailableException("Room " + roomID + " is closed");
         }
+
+        RoomParticipant participant = room.getParticipants()
+                .stream()
+                .filter(p->p.getUser().getId().equals(currentUser.getId()))
+                .findFirst()
+                .orElse(null);
+
+        if(participant != null){
+            RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_REJOIN");
+            return new LeaveJoinRoomResponseDto(mapper.map(room,RoomResponseDto.class),eventDto);
+        }
+
+
+
         if (room.getStatus() == RoomsStatus.FULL) {
             throw new RoomNotAvailableException("Room " + roomID + " is full");
         }

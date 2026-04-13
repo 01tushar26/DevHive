@@ -50,6 +50,7 @@ public class RoomController {
         RoomResponseDto responseDto = service.getRoom(id);
         return ResponseEntity.ok(responseDto);
     }
+
     // not usefull in case of websocket it do it automatically but for future
 //    @PatchMapping("/{roomId}/code")
 //    public ResponseEntity<Void> updateCode(@PathVariable(name = "roomId") String id, @RequestBody UpdateCodeRequestDto dto) {

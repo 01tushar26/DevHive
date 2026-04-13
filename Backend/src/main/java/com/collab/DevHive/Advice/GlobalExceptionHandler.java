@@ -19,18 +19,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiResponse<?>> handleNotFound(ResourceNotFoundException ex){
 
-        ApiError er= ApiError.builder().message(ex.getLocalizedMessage()).status(HttpStatus.NOT_FOUND).timestamp(Timestamp.valueOf(LocalDateTime.now())).build();
+        ApiError er= ApiError.builder().message(ex.getLocalizedMessage()).status(HttpStatus.BAD_REQUEST).timestamp(Timestamp.valueOf(LocalDateTime.now())).build();
         ApiResponse<?> res = ApiResponse.builder().error(er).time(LocalDateTime.now()).build();
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
     @ExceptionHandler(RoomNotAvailableException.class)
-    public ResponseEntity<ApiResponse<?>> handleRoomNotFound(ResourceNotFoundException ex){
+    public ResponseEntity<ApiResponse<?>> handleRoomNotFound(RoomNotAvailableException ex){
 
-        ApiError er= ApiError.builder().message(ex.getLocalizedMessage()).status(HttpStatus.NOT_FOUND).timestamp(Timestamp.valueOf(LocalDateTime.now())).build();
+        ApiError er= ApiError.builder().message(ex.getLocalizedMessage()).status(HttpStatus.BAD_REQUEST).timestamp(Timestamp.valueOf(LocalDateTime.now())).build();
         ApiResponse<?> res = ApiResponse.builder().error(er).time(LocalDateTime.now()).build();
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(res);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
     @ExceptionHandler(AlreadyExistException.class)
     public ResponseEntity<ApiResponse<?>> alreadyExist(AlreadyExistException ex){
