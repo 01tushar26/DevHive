@@ -9,44 +9,79 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from './ui/button'
-import axios from 'axios'
 import { Input } from './ui/input'
 import { Field, FieldLabel } from './ui/field'
 import { useNavigate } from 'react-router-dom'
 import ThemeSelector from './ThemeSelector'
 import axiosInstance from '@/lib/axios-instance'
+import { Code2, Share2, Users } from 'lucide-react'
+import { toast } from 'sonner'
 
 const EditorToolBar = ({ language, setLanguage,theme,setTheme }) => {
   // inputRef used for get its input value ....and we used it because it did not rerender the compnent
   const inputRef =useRef()
+  const roomLinkRef = useRef()
   const navigate = useNavigate()
 
   const sendCreateRoomRequest=async()=>{
 
-      try {
-        if(!inputRef.current || inputRef.current.value == ""){
+      if(!inputRef.current || inputRef.current.value == ""){
+           toast.error("Please enter your name !!")
           return
         }
+
+      try {
+        
        
       const response =  await axiosInstance.post("/rooms"
         ,{ userName: inputRef.current.value}
        )
-       console.log(response)
+       
 
        if(response.status === 201){
-        console.log(response.data.data.id)
-        navigate(`/room/${response.data.data.id}`)
+        const roomId = response.data.data.id
+
+      
+      localStorage.setItem(`room_owner_${roomId}`, "true")
+      localStorage.setItem("userName", inputRef.current.value)
+      toast.success("Room created successfully !!")
+      
+         setTimeout(() => navigate(`/room/${response.data.data.id}`), 1000)
+        
        }
         
-      } catch (error) {
+      } 
+      catch (error) {
+       const message =
+        error.response?.data?.error?.message || 
+        error.response?.data?.data?.message || 
+        "Failed to create room"
+
+      toast.error(message)
         
       }
   }
-  return (
-   <div className="flex items-center justify-between px-4 py-2 bg-[#14171d] border-b border-gray-700">
-      <h1 className="text-sm font-semibold text-[#00ffaab4]">Dev Hive</h1>
 
-      <div className="flex items-center gap-2">
+  const sendJoinRoomRequest=async()=>{
+
+      if(!roomLinkRef.current || roomLinkRef.current.value == ""){
+           toast.error("Please enter room link !!")
+          return
+        }
+        window.location.href = roomLinkRef.current.value;
+
+      
+  }
+  return (
+   <div className="flex items-center justify-between px-6 py-3 bg-zinc-900 border-b border-zinc-800">
+      <div className="flex items-center gap-3">
+        <div className="flex items-center justify-center w-8 h-8 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+          <Code2 className="w-5 h-5 text-emerald-500" />
+        </div>
+        <h1 className="text-lg font-semibold text-zinc-100 tracking-tight">DevHive</h1>
+      </div>
+
+      <div className="flex items-center gap-4">
         <LanguageSelector
           language={language}
           setLanguage={setLanguage}
@@ -61,28 +96,90 @@ const EditorToolBar = ({ language, setLanguage,theme,setTheme }) => {
           Run
         </button> */}
   <Dialog>
-  <DialogTrigger>
-    <Button className="bg-[#00ffaab4] text-black}" variant="secondary">
-      Share
+         <DialogTrigger asChild>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 border-0">
+              <Users className="w-4 h-4" />
+              Collaborate
+            </Button>
+          </DialogTrigger>
+
+  <DialogContent className="bg-zinc-900 border-zinc-800 text-zinc-100 sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-xl flex items-center gap-2">
+                <Share2 className="w-5 h-5 text-emerald-500" />
+                Live Collaboration
+              </DialogTitle>
+              <DialogDescription className="text-zinc-400 pt-2 pb-4">
+                Invite people to collaborate on your code. The session is end-to-end encrypted and fully private.
+              </DialogDescription>
+              <div className="space-y-4">
+                <Field>
+                  <FieldLabel className="text-zinc-300">Enter your name</FieldLabel>
+                  <Input 
+                    ref={inputRef} 
+                    placeholder="e.g. John Doe" 
+                    className="bg-zinc-950 border-zinc-800 focus:ring-emerald-500"
+                    required
+                  />
+                </Field>
+                <Button 
+                  onClick={sendCreateRoomRequest} 
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                >
+                  Start Session
+                </Button>
+              </div>
+            </DialogHeader>
+
+    
+
+  {/* --- JOIN SESSION SECTION --- */}
+  <div className="relative flex items-center ">
+  <div className="flex-grow border-t border-zinc-800"></div>
+  <span className="flex-shrink mx-4 text-zinc-500 text-sm uppercase tracking-wider font-medium">
+    Or
+  </span>
+  <div className="flex-grow border-t border-zinc-800"></div>
+</div>
+ <DialogHeader>
+  <DialogDescription className="text-zinc-400 pt-2 pb-2">
+    Join an existing collaboration session by pasting the room link below.
+  </DialogDescription>
+</DialogHeader>
+
+  <div className="space-y-1">
+    {/* <Field>
+      <FieldLabel className="text-zinc-300">Enter your name</FieldLabel>
+      <Input 
+        ref={joinNameRef} 
+        placeholder="e.g. Jane Doe" 
+        className="bg-zinc-950 border-zinc-800 focus:ring-emerald-500"
+        required
+      />
+    </Field> */}
+    
+   <Field>
+    <FieldLabel className="text-zinc-300">Room Link</FieldLabel>
+    <Input 
+      ref={roomLinkRef} 
+      placeholder="Paste room URL or ID here" 
+      className="bg-zinc-950 border-zinc-800 focus:ring-emerald-500"
+      required
+    />
+  </Field>
+
+    <div className="pt-2">
+    <Button 
+      onClick={sendJoinRoomRequest} 
+      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+    >
+      Join Session
     </Button>
-  </DialogTrigger>
-  <DialogContent className="flex justify-center items-center bg-[#00ffaab4] px-10">
-    <DialogHeader>
-      <DialogTitle>Live collaboration</DialogTitle>
-      <DialogDescription>
-        <span>Invite people to collaborate on your drawing.
-Don't worry, the session is end-to-end encrypted, and fully private. Not even our server can see what you draw.</span>
-        <Field>
-          <FieldLabel>
-            Enter your name
-          </FieldLabel>
-          <Input ref={inputRef} placeholder="John" type="text" required/>
-        </Field>
-        
-        <Button onClick={()=>sendCreateRoomRequest()}>Start Session</Button>
-      </DialogDescription>
-    </DialogHeader>
-  </DialogContent>
+  </div>
+
+  </div>
+
+          </DialogContent>
 </Dialog>
       </div>
     </div>

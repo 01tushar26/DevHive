@@ -1,6 +1,6 @@
 import RoomEditorToolBar from '@/components/RoomEditorToolBar';
 import React from 'react'
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useState ,useRef,useEffect} from 'react';
 import CodeEditor from '@/components/CodeEditor';
 import { connectSocket,sendCodeUpdate,disconnectSocket } from '@/Websockets/socket';
@@ -8,17 +8,46 @@ import { toast  } from 'sonner';
 import axios from 'axios';
 import axiosInstance from '@/lib/axios-instance';
 
+
 const RoomPage = () => {
+
     const [code, setCode] = useState("// Start coding...");
     const [language, setLanguage] = useState("javascript");
     const [theme, setTheme] = useState("vs-dark");
+    const [roomClosed, setRoomClosed] = useState(false)
+    const navigate = useNavigate()
+
 
     const {roomId } = useParams()
     const username = "Tushar"; // later auth-based
+    const isRemoteUpdate = useRef(false);
 
-  const isRemoteUpdate = useRef(false);
+     useEffect(() => {
+    async function getRoomCode() {
+      try {
+        const res = await axiosInstance.get(`/rooms/${roomId}`)
+        if (res.status === 200) {
+          if (res.data.data.status === "CLOSED") {
+            setRoomClosed(true)
+            toast.error("This room has been closed.")
+
+            setTimeout(() => navigate("/"), 1000)
+            return
+          }
+          setCode(res.data.data.code)
+        }
+      } catch (error) {
+          const message = error.response?.data?.error?.message || "Failed to load room."
+          toast.error(message)
+        setTimeout(() => navigate("/"), 3000)
+      }
+    }
+    getRoomCode()
+  }, [roomId, navigate])
 
   useEffect(() => {
+
+      if (roomClosed) return
 
     connectSocket(roomId, (data) => {
        if (data.message === "USER_LEFT") {
@@ -40,17 +69,8 @@ const RoomPage = () => {
 
   }, [roomId]);
 
-  useEffect(()=>{
-    async function getRoomCode() {
 
-      const res = await axiosInstance.get(`/rooms/${roomId}`)
-      if(res.status === 200){
-        setCode(res.data.data.code)
-      }
-      
-    }
-    getRoomCode()
-  },[roomId])
+ 
 
   const handleCodeChange = (newCode) => {
     if (isRemoteUpdate.current) {

@@ -22,6 +22,9 @@ export const connectSocket = (roomId, onMessageReceived) => {
         if (data.status === "CLOSED") {
           // endRoom — disconnect all and redirect
           disconnectSocket();
+          
+          toast.error("The room has been closed by the host")
+
           window.location.href = 'http://localhost:5173/';
 
         } else if (data.message === "USER_LEFT") {

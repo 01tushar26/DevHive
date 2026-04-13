@@ -56,9 +56,11 @@ axiosInstance.interceptors.response.use(
       } catch (err) {
 
         localStorage.removeItem('accessToken');
-        toast.error("Please login first")
-        window.location.href = 'http://localhost:5173/login';
-        return Promise.reject(err);
+        toast.error("Please login first !!")
+
+         setTimeout(() =>  window.location.href = 'http://localhost:5173/login', 1100)
+       
+         return new Promise(() => {})
       }
     }
 

@@ -22,11 +22,14 @@ function Login() {
     const usernameRef = useRef()
     const passwordRef = useRef()
     const navigate = useNavigate()
+
     const handleLogin=async()=>{
      if(!usernameRef.current || usernameRef.current.value==""){
+        toast.error("Email is required")
         return;
      }
      if(!passwordRef.current || passwordRef.current.value==""){
+       toast.error("Password is required")
         return;
      }
      try{
@@ -39,8 +42,9 @@ function Login() {
        
         const accessToken  = response.data.data.accessToken;
         localStorage.setItem("accessToken",accessToken)
-         toast.success("Login Successfully !!")
-         navigate("/")
+        toast.success("Login Successfully !!")
+         setTimeout(() => navigate("/"), 1000)
+        
          
 
      }
@@ -57,7 +61,7 @@ function Login() {
         <Dialog>
   <DialogTrigger>
     <Button className="bg-[#00ffaab4] text-black}" variant="secondary">
-      Share
+      Login
     </Button>
   </DialogTrigger>
   <DialogContent className="flex justify-center items-center bg-[#00ffaab4] px-10">
