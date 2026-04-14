@@ -6,6 +6,7 @@ import DefaultPage from './page/default-page'
 import RoomPage from './page/room-page'
 import JoinPage from './page/join-page'
 import Login from './page/login'
+import SignUp from './page/signup-page'
 
 function App() {
   
@@ -15,6 +16,7 @@ function App() {
      <Routes>
       <Route path='/' element = {<DefaultPage/>}></Route>
       <Route path='/login' element = {<Login/>}></Route>
+      <Route path='/signup' element = {<SignUp/>}></Route>
       <Route path='/room/:roomId' element = {<RoomPage/>}></Route>
       <Route path='/room/:roomId/join' element = {<JoinPage/>}></Route>
 

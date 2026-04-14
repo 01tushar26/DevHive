@@ -51,7 +51,20 @@ const RoomEditorToolBar = ({ language, setLanguage ,roomId ,theme ,setTheme}) =>
           <Code2 className="w-5 h-5 text-emerald-500" />
         </div>
         <div className="flex flex-col">
-          <h1 className="text-lg font-semibold text-zinc-100 tracking-tight leading-none">DevHive</h1>
+          <h1 className="text-lg font-bold  tracking-tight ">
+            <ShinyText
+  text="DevHive"
+  speed={2.3}
+  delay={0}
+  color="#F4F4F5"
+  shineColor="#059669"
+  spread={120}
+  direction="left"
+  yoyo={false}
+  pauseOnHover={false}
+  disabled={false}
+/>      
+       </h1>
           {/* <span className="text-xs text-emerald-500 font-medium mt-1">Live Room: {roomId.slice(0, 8)}...</span> */}
         </div>
       </div>
@@ -71,12 +84,12 @@ const RoomEditorToolBar = ({ language, setLanguage ,roomId ,theme ,setTheme}) =>
             Run
           </button> */}
           <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700 hover:text-white gap-2">
-              <Users className="w-4 h-4" />
-              Invite
-            </Button>
-          </DialogTrigger>
+           <DialogTrigger asChild>
+                      <Button className="bg-emerald-600 hover:bg-emerald-700 text-black gap-2 border-0">
+                        <Users className="w-4 h-4" />
+                        Invite
+                      </Button>
+                    </DialogTrigger>
           <DialogContent className="bg-zinc-900 border-zinc-800 text-zinc-100 sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="text-xl">Room Invite Link</DialogTitle>

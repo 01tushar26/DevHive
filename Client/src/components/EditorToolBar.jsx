@@ -16,6 +16,7 @@ import ThemeSelector from './ThemeSelector'
 import axiosInstance from '@/lib/axios-instance'
 import { Code2, Share2, Users } from 'lucide-react'
 import { toast } from 'sonner'
+import ShinyText from './ui/shinyText'
 
 const EditorToolBar = ({ language, setLanguage,theme,setTheme }) => {
   // inputRef used for get its input value ....and we used it because it did not rerender the compnent
@@ -76,9 +77,24 @@ const EditorToolBar = ({ language, setLanguage,theme,setTheme }) => {
    <div className="flex items-center justify-between px-6 py-3 bg-zinc-900 border-b border-zinc-800">
       <div className="flex items-center gap-3">
         <div className="flex items-center justify-center w-8 h-8 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-          <Code2 className="w-5 h-5 text-emerald-500" />
+          <Code2 className="w-5 h-5 text-emerald-600" />
         </div>
-        <h1 className="text-lg font-semibold text-zinc-100 tracking-tight">DevHive</h1>
+        <h1 className="text-lg font-bold  tracking-tight">
+          
+
+<ShinyText
+  text="DevHive"
+  speed={2.3}
+  delay={0}
+  color="#F4F4F5"
+  shineColor="#059669"
+  spread={120}
+  direction="left"
+  yoyo={false}
+  pauseOnHover={false}
+  disabled={false}
+/>
+        </h1>
       </div>
 
       <div className="flex items-center gap-4">
@@ -97,16 +113,16 @@ const EditorToolBar = ({ language, setLanguage,theme,setTheme }) => {
         </button> */}
   <Dialog>
          <DialogTrigger asChild>
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 border-0">
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-black gap-2 border-0">
               <Users className="w-4 h-4" />
               Collaborate
             </Button>
           </DialogTrigger>
 
-  <DialogContent className="bg-zinc-900 border-zinc-800 text-zinc-100 sm:max-w-md">
+  <DialogContent className="bg-zinc-950 border-zinc-800 text-zinc-100 sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="text-xl flex items-center gap-2">
-                <Share2 className="w-5 h-5 text-emerald-500" />
+                <Share2 className="w-5 h-5 text-emerald-600" />
                 Live Collaboration
               </DialogTitle>
               <DialogDescription className="text-zinc-400 pt-2 pb-4">
@@ -118,13 +134,13 @@ const EditorToolBar = ({ language, setLanguage,theme,setTheme }) => {
                   <Input 
                     ref={inputRef} 
                     placeholder="e.g. John Doe" 
-                    className="bg-zinc-950 border-zinc-800 focus:ring-emerald-500"
+                    className="bg-zinc-900/80 border-zinc-700 text-white placeholder:text-zinc-600 pl-8 focus-visible:ring-emerald-600"
                     required
                   />
                 </Field>
                 <Button 
                   onClick={sendCreateRoomRequest} 
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-black"
                 >
                   Start Session
                 </Button>
@@ -163,7 +179,7 @@ const EditorToolBar = ({ language, setLanguage,theme,setTheme }) => {
     <Input 
       ref={roomLinkRef} 
       placeholder="Paste room URL or ID here" 
-      className="bg-zinc-950 border-zinc-800 focus:ring-emerald-500"
+       className="bg-zinc-900/80 border-zinc-700 text-white placeholder:text-zinc-600 pl-8 focus-visible:ring-emerald-600"
       required
     />
   </Field>
@@ -171,7 +187,7 @@ const EditorToolBar = ({ language, setLanguage,theme,setTheme }) => {
     <div className="pt-2">
     <Button 
       onClick={sendJoinRoomRequest} 
-      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+      className="w-full bg-emerald-600 hover:bg-emerald-700 text-black"
     >
       Join Session
     </Button>
