@@ -9,6 +9,7 @@ import { Input } from './ui/input'
 import axios from 'axios'
 import axiosInstance from '@/lib/axios-instance'
 import { toast } from 'sonner'
+import ShinyText from './ui/shinyText'
 
 
 const RoomEditorToolBar = ({ language, setLanguage ,roomId ,theme ,setTheme}) => {

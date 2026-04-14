@@ -2,17 +2,10 @@
 import React from 'react'
 import { useRef } from 'react'
 import { toast } from 'sonner'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Field, FieldLabel } from '@/components/ui/field'
+
 import { Link, useNavigate } from 'react-router-dom'
 import axiosInstance from '@/lib/axios-instance'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
@@ -47,7 +40,7 @@ function SignUp() {
       const response = await axiosInstance.post('/auth/signup',
         {
             "name":usernameRef.current.value,
-            "name":useremailRef.current.value,
+            "email":useremailRef.current.value,
             "password":passwordRef.current.value
         })
        
