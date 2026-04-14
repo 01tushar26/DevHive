@@ -20,10 +20,14 @@ const RoomEditorToolBar = ({ language, setLanguage ,roomId ,theme ,setTheme}) =>
     try {
       await axiosInstance.delete(`/rooms/${roomId}/end`);
 
-      toast.success(`Room with id ${roomId} deleted successfully`,{position:"top-center"})
+      toast.success(`Room with id ${roomId} deleted successfully`)
       
     } catch (error) {
-      toast.success(`Failed to delete room with id ${roomId}`,{position:"top-center"})
+       const message =
+        error.response?.data?.error?.message || 
+        error.response?.data?.data?.message || 
+        "Failed to delete room"
+      toast.success(message);
     }
   }
   
