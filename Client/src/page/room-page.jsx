@@ -51,15 +51,14 @@ const RoomPage = () => {
 
     connectSocket(roomId, (data) => {
        if (data.message === "USER_LEFT") {
-        // setParticipants(prev => prev.filter(p => p.userId !== data.userId));
-        toast.error(`${data.userName} left the room`);  // or any notification lib
-
+        
+        toast.error(`${data.userName} left the room !!`);  
     } else if (data.message === "USER_JOIN") {
-        // setParticipants(prev => [...prev, { userId: data.userId, name: data.name }]);
-        toast.success(`${data.userName} joined the room`);
+        
+        toast.success(`${data.userName} joined the room !!`);
 
     } else {
-        // code update
+        
         ('updating code .....')
         isRemoteUpdate.current = true;  // 
         setCode(data.code);
