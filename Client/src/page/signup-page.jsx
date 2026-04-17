@@ -93,7 +93,7 @@ function SignUp() {
             id="username"
             type="text"
             
-            className="bg-zinc-900/80 border-zinc-700 text-white placeholder:text-zinc-600 pl-8 focus-visible:ring-emerald-600"
+            className="bg-zinc-900/80 border-zinc-700 text-white placeholder:text-zinc-600 pl-4 px-4 focus-visible:ring-emerald-600"
           />
         </div>
       </div>
@@ -109,7 +109,7 @@ function SignUp() {
             id="username"
             type="text"
             
-            className="bg-zinc-900/80 border-zinc-700 text-white placeholder:text-zinc-600 pl-8 focus-visible:ring-emerald-600"
+            className="bg-zinc-900/80 border-zinc-700 text-white placeholder:text-zinc-600 px-4 py-4 focus-visible:ring-emerald-600"
           />
         </div>
       </div>
@@ -131,7 +131,7 @@ function SignUp() {
             id="password"
             type="password"
            
-            className="bg-zinc-900/80 border-zinc-700 text-white placeholder:text-zinc-600 pl-8 focus-visible:ring-emerald-600"
+            className="bg-zinc-900/80 border-zinc-700 text-white placeholder:text-zinc-600 px-4 py-4 focus-visible:ring-emerald-600"
           />
         </div>
       </div>
