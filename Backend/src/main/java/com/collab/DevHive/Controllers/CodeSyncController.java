@@ -1,17 +1,19 @@
 package com.collab.DevHive.Controllers;
 
 import com.collab.DevHive.DTO.CodeUpdateMessage;
-import com.collab.DevHive.DTO.UpdateCodeRequestDto;
-import com.collab.DevHive.Entities.Room;
-import com.collab.DevHive.Exceptions.ResourceNotFoundException;
-import com.collab.DevHive.Repositories.RoomRepository;
+
 import com.collab.DevHive.Service.RoomService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+
+import java.util.concurrent.TimeUnit;
 
 @Controller
 @RequiredArgsConstructor
@@ -19,20 +21,28 @@ public class CodeSyncController {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final RoomService roomService;
-    private final RoomRepository roomRepo;
+
+    private final StringRedisTemplate template;
+    private static final String ROOM_CODE_KEY = "room:";
+    private static final long ROOM_TTL_HOURS = 2;
 
     @MessageMapping("/code-update/{roomId}")
     public void handleCodeUpdate(
             @DestinationVariable String roomId,
             @Payload CodeUpdateMessage message
+
     ) {
-      // this update method is authentivcayed
 
-        UpdateCodeRequestDto dto = new UpdateCodeRequestDto();
-        dto.setCode(message.getCode());
 
-        //for persistent
-        roomService.updateCode(roomId, dto);
+//        UpdateCodeRequestDto dto = new UpdateCodeRequestDto();
+//        dto.setCode(message.getCode());
+
+
+        //dont hit db hit cache
+        String key = ROOM_CODE_KEY + roomId;
+        template.opsForValue().set(key, message.getCode(), ROOM_TTL_HOURS, TimeUnit.HOURS);
+
+
 
 
         //client subscribe from that url

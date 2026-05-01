@@ -16,9 +16,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.TimeUnit;
 
 import static com.collab.DevHive.Util.Util.generateRoomId;
 import static com.collab.DevHive.Util.Util.getAuthenticatedUser;
@@ -30,9 +34,14 @@ public class RoomServiceImpl implements RoomService{
 
     private final RoomRepository roomRepository;
     private final ModelMapper mapper;
+    private final StringRedisTemplate redisTemplate;
+
+    private static final long ROOM_TTL_HOURS = 2;
+    private static final String ROOM_CODE_KEY = "room:";
 
     private static final int MAX_PARTICIPANTS = 10;
     private static final int MAX_RETRY_ATTEMPTS = 3;
+
 
 
     @Override
@@ -61,6 +70,9 @@ public class RoomServiceImpl implements RoomService{
                 newRoom.setId(generateRoomId());
                 newRoom = roomRepository.save(newRoom);
                 log.info("Room created with id: {}", newRoom.getId());
+
+                //put it into redis
+                seedRedis(newRoom.getId(),newRoom.getCode());
                 return mapper.map(newRoom,RoomResponseDto.class);
             } catch (DataIntegrityViolationException e) {
                 log.warn("Room ID collision on attempt {}, retrying...", attempt + 1);
@@ -95,6 +107,7 @@ public class RoomServiceImpl implements RoomService{
                 .orElse(null);
 
         if(participant != null){
+            ensureRedisSeeded(roomID,room.getCode());
             RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_REJOIN");
             return new LeaveJoinRoomResponseDto(mapper.map(room,RoomResponseDto.class),eventDto);
         }
@@ -163,6 +176,7 @@ public class RoomServiceImpl implements RoomService{
         room.setCode(dto.getCode());
 
         roomRepository.save(room);
+        log.debug("Periodic DB sync done for room: {}", roomId);
     }
 
     @Override
@@ -182,15 +196,26 @@ public class RoomServiceImpl implements RoomService{
                 .filter(p->p.getUser().getId().equals(currentUser.getId()))
                 .findFirst().orElseThrow(()->new AccessDeniedException("You re not the member of the room"));
 
-       //todo-add if the user is not the owner then it left the room
+
 
         if(participant.getRole() != ParticipantsRoles.OWNER){
-            throw new AccessDeniedException("You re not the member of the room");
+            throw new AccessDeniedException("You cannot end the room pls leave the room ");
+        }
+        //make sure that the code has been updated in db
+        String latestCode = redisTemplate.opsForValue().get(ROOM_CODE_KEY + roomId);
+
+        if (latestCode != null) {
+            room.setCode(latestCode);
+            log.info("Final code synced from Redis to DB for room: {}", roomId);
         }
 
 
         room.setStatus(RoomsStatus.CLOSED);
         room = roomRepository.save(room);
+
+        redisTemplate.delete(ROOM_CODE_KEY + roomId);
+        log.info("Redis key deleted for closed room: {}", roomId);
+
         return mapper.map(room,RoomResponseDto.class);
     }
 
@@ -222,6 +247,26 @@ public class RoomServiceImpl implements RoomService{
         RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_LEFT");
         return new LeaveJoinRoomResponseDto(mapper.map(room,RoomResponseDto.class),eventDto);
 
+    }
+
+    // basically to put the code in redis
+    private void seedRedis(String roomId, String code) {
+        redisTemplate.opsForValue().set(
+                ROOM_CODE_KEY + roomId,
+                code,
+                ROOM_TTL_HOURS,
+                TimeUnit.HOURS
+        );
+        log.debug("Redis seeded for room: {}", roomId);
+    }
+    //ensure whether the server didnot restart cache didnot get clean
+    private void ensureRedisSeeded(String roomId, String code) {
+        String key = ROOM_CODE_KEY + roomId;
+
+        if (Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
+            redisTemplate.opsForValue().set(key, code, ROOM_TTL_HOURS, TimeUnit.HOURS);
+            log.debug("Redis re-seeded after miss for room: {}", roomId);
+        }
     }
 
 }

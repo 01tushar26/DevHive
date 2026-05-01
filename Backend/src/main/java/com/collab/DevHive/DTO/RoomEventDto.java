@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoomEventDto {
+
     private String userName;
     private Long id;
     private String message;
