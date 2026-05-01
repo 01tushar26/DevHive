@@ -45,6 +45,8 @@ const RoomPage = () => {
     getRoomCode()
   }, [roomId, navigate])
 
+
+  // todo- data .message is checked two time first on socket .js and second is here edit it
   useEffect(() => {
 
       if (roomClosed) return
@@ -57,7 +59,10 @@ const RoomPage = () => {
         
         toast.success(`${data.userName} joined the room !!`);
 
-    } else {
+    } else if(data.message == "USER_REJOIN") {
+      toast.success(`${data.userName} rejoined the room !!`);
+    }
+    else {
         
         ('updating code .....')
         isRemoteUpdate.current = true;  // 

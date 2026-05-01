@@ -17,6 +17,7 @@ export const connectSocket = (roomId, onMessageReceived) => {
 
       // subscribe to room
       stompClient.subscribe(`/topic/room/${roomId}`, (message) => {
+
         const data = JSON.parse(message.body);
 
         if (data.status === "CLOSED") {
@@ -26,22 +27,8 @@ export const connectSocket = (roomId, onMessageReceived) => {
           toast.error("The room has been closed by the host")
 
           window.location.href = 'http://localhost:5173/';
-
-        } else if (data.message === "USER_LEFT") {
-          // leaveRoom — show notification, update participant list
-          toast.success(`${data.userName} left the room`);
-          onMessageReceived(data);  // handle UI update in the component
-
-        } else if (data.message === "USER_JOIN") {
-          // joinRoom — show notification, update participant list
-          toast.success(`${data.userName} joined the room`);
-          onMessageReceived(data);  // handle UI update in the component
-
-        } else {
-          // code update or other messages
-          console.log('message !' , data)
+        } 
           onMessageReceived(data);
-        }
       });
     },
 

@@ -42,9 +42,9 @@ const EditorToolBar = ({ language, setLanguage,theme,setTheme }) => {
        if(response.status === 201){
         const roomId = response.data.data.id
 
-      
-      localStorage.setItem(`room_owner_${roomId}`, "true")
-      localStorage.setItem("userName", inputRef.current.value)
+      //this is to check wether the current client is owner or not so that to show leave and end button there
+      // localStorage.setItem(`room_owner_${roomId}`, "true")
+      // localStorage.setItem("userName", inputRef.current.value)
       toast.success("Room created successfully !!")
       
          setTimeout(() => navigate(`/room/${response.data.data.id}`), 1000)
