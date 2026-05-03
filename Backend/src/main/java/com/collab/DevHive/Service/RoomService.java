@@ -10,9 +10,10 @@ public interface RoomService {
     RoomResponseDto createRoom(RoomRequestDto dto);
     LeaveJoinRoomResponseDto joinRoom(String roomID, String userName);
     RoomResponseDto getRoom(String roomID);
-    void updateCode(String roomId, UpdateCodeRequestDto dto);
+//    void updateCode(String roomId, String dto);
     RoomResponseDto endRoom(String roomId);
     LeaveJoinRoomResponseDto leaveRoom(String roomId);
+
 
 
 }

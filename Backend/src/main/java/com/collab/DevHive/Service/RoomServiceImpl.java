@@ -15,6 +15,7 @@ import com.collab.DevHive.Util.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -137,42 +138,40 @@ public class RoomServiceImpl implements RoomService{
 
 
         room = roomRepository.save(room);
+        ensureRedisSeeded(roomID,room.getCode());
         RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_JOIN");
         return new LeaveJoinRoomResponseDto(mapper.map(room,RoomResponseDto.class),eventDto);
     }
 
     @Override
     public RoomResponseDto getRoom(String roomId) {
-
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
-        return mapper.map(room,RoomResponseDto.class);
-    }
-
-
-    @Override
-    @Transactional
-    public void updateCode(String roomId, UpdateCodeRequestDto dto) {
-
-//        User currentUser = getAuthenticatedUser();
-
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
 
-        //first check whether the user is a member of room or not
-//        RoomParticipant participant = room
-//                .getParticipants().stream()
-//                        .filter(p->p.getUser().getId().equals(currentUser.getId()))
-//                                .findFirst().orElseThrow(()->new AccessDeniedException("You re not the member of the room"));
-//        //then check whether the user is Join as view only or not
-//        if (participant.getRole() == ParticipantsRoles.VIEWER) {
-//            throw new AccessDeniedException("Viewers cannot edit code");
-//        }
-        room.setCode(dto.getCode());
+        // if the new user before 30 second db will not updated yet
+        String liveCode = redisTemplate.opsForValue().get(ROOM_CODE_KEY + roomId);
+        if (liveCode != null) {
+            room.setCode(liveCode);  // override stale DB code with live Redis value
+        }
 
-        roomRepository.save(room);
-        log.debug("Periodic DB sync done for room: {}", roomId);
+        return mapper.map(room, RoomResponseDto.class);
     }
+
+
+//    @Override
+//    @Transactional
+//    public void updateCode(String roomId, String code) {
+//
+//
+//
+//        Room room = roomRepository.findById(roomId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
+//
+//        room.setCode(code);
+//
+//        roomRepository.save(room);
+//        log.debug("Periodic DB sync done for room: {}", roomId);
+//    }
 
     @Override
     @Transactional

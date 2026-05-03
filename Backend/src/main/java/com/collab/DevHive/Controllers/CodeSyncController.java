@@ -4,8 +4,7 @@ import com.collab.DevHive.DTO.CodeUpdateMessage;
 
 import com.collab.DevHive.Service.RoomService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
+
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -23,7 +22,7 @@ import static com.collab.DevHive.Util.Util.ROOM_TTL_HOURS;
 public class CodeSyncController {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final RoomService roomService;
+
 
     private final StringRedisTemplate template;
 
