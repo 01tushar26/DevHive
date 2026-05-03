@@ -24,8 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.collab.DevHive.Util.Util.generateRoomId;
-import static com.collab.DevHive.Util.Util.getAuthenticatedUser;
+import static com.collab.DevHive.Util.Util.*;
 
 @Service
 @Slf4j
@@ -36,11 +35,7 @@ public class RoomServiceImpl implements RoomService{
     private final ModelMapper mapper;
     private final StringRedisTemplate redisTemplate;
 
-    private static final long ROOM_TTL_HOURS = 2;
-    private static final String ROOM_CODE_KEY = "room:";
 
-    private static final int MAX_PARTICIPANTS = 10;
-    private static final int MAX_RETRY_ATTEMPTS = 3;
 
 
 
@@ -208,6 +203,10 @@ public class RoomServiceImpl implements RoomService{
             room.setCode(latestCode);
             log.info("Final code synced from Redis to DB for room: {}", roomId);
         }
+        else {
+            log.warn("Redis miss on room close for room: {} — DB may have stale code. " +
+                    "Redis may have evicted the key or restarted.", roomId);
+        }
 
 
         room.setStatus(RoomsStatus.CLOSED);
@@ -222,7 +221,9 @@ public class RoomServiceImpl implements RoomService{
     @Override
     @Transactional
     public LeaveJoinRoomResponseDto leaveRoom(String roomId) {
+
         log.info("Leaving the room with id: {}",roomId);
+
         User currentUser = getAuthenticatedUser();
         Room room = roomRepository.findById(roomId).orElseThrow(
                 ()->new ResourceNotFoundException("Room is Not found with id "+roomId)
@@ -242,6 +243,11 @@ public class RoomServiceImpl implements RoomService{
         }
 
         room.getParticipants().remove(participant);
+
+        if (room.getStatus() == RoomsStatus.FULL && room.getParticipants().size() < MAX_PARTICIPANTS) {
+            room.setStatus(RoomsStatus.ACTIVE);
+        }
+
         room = roomRepository.save(room);
 
         RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_LEFT");

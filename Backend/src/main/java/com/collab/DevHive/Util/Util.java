@@ -23,5 +23,9 @@ public final class  Util {
         }
         return (User) auth.getPrincipal();
     }
+    public static final String ROOM_CODE_KEY = "room:";
+    public static final long ROOM_TTL_HOURS = 2;
+    public static final int MAX_PARTICIPANTS = 10;
+    public static final int MAX_RETRY_ATTEMPTS = 3;
 
 }

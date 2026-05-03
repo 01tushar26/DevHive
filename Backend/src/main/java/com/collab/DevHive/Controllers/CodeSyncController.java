@@ -15,6 +15,9 @@ import org.springframework.stereotype.Controller;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.collab.DevHive.Util.Util.ROOM_CODE_KEY;
+import static com.collab.DevHive.Util.Util.ROOM_TTL_HOURS;
+
 @Controller
 @RequiredArgsConstructor
 public class CodeSyncController {
@@ -23,8 +26,7 @@ public class CodeSyncController {
     private final RoomService roomService;
 
     private final StringRedisTemplate template;
-    private static final String ROOM_CODE_KEY = "room:";
-    private static final long ROOM_TTL_HOURS = 2;
+
 
     @MessageMapping("/code-update/{roomId}")
     public void handleCodeUpdate(
@@ -70,5 +72,3 @@ public class CodeSyncController {
 //broadcast to /topic/room/{roomId}  (server send the message )
 //      ↓
 //all users in room receive update
-
-// to delete the connect used the stomp.deacticate
