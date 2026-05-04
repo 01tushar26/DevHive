@@ -2,15 +2,16 @@ package com.collab.DevHive.Controllers;
 
 import com.collab.DevHive.DTO.CodeUpdateMessage;
 
-import com.collab.DevHive.Service.RoomService;
+import com.collab.DevHive.Service.RedisService.RedisMessagePublisher;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.concurrent.TimeUnit;
 
@@ -19,12 +20,16 @@ import static com.collab.DevHive.Util.Util.ROOM_TTL_HOURS;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class CodeSyncController {
-
-    private final SimpMessagingTemplate messagingTemplate;
 
 
     private final StringRedisTemplate template;
+    private final RedisMessagePublisher publisher;
+    private final ObjectMapper objectMapper;
+
+
+
 
 
     @MessageMapping("/code-update/{roomId}")
@@ -45,12 +50,14 @@ public class CodeSyncController {
 
 
 
-
-        //client subscribe from that url
-        messagingTemplate.convertAndSend(
-                "/topic/room/" + roomId,
-                message
-        );
+        try {
+            // Make sure roomId is in the message so subscriber knows the topic
+            message.setRoomId(roomId);
+            String json = objectMapper.writeValueAsString(message);
+            publisher.publish(json);
+        } catch (Exception e) {
+            log.error("Failed to publish code update for room {}: {}", roomId, e.getMessage());
+        }
     }
 }
 
