@@ -22,6 +22,7 @@ public class RoomSyncScheduler {
     @Scheduled(fixedRate = 30_000)
     @Transactional
     public void syncActiveRoomsToDb() {
+        //yolo consistency
         ScanOptions options = ScanOptions.scanOptions().match("room:*").count(100).build();
 
         try (Cursor<byte[]> cursor = redisTemplate.getConnectionFactory()
