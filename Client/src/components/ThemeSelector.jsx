@@ -3,7 +3,7 @@ import React from 'react'
 const ThemeSelector = ({ theme, setTheme }) => {
   return (
      <select
-      className="bg-zinc-950 border border-zinc-800 text-zinc-300 text-sm px-3 py-1.5 rounded-md outline-none focus:border-emerald-500 transition-colors cursor-pointer appearance-none min-w-[140px]"
+      className="bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant text-sm px-3 py-1.5 rounded-md outline-none focus:border-primary-container transition-colors cursor-pointer appearance-none min-w-[140px]"
       value={theme}
       onChange={(e) => setTheme(e.target.value)}
     >

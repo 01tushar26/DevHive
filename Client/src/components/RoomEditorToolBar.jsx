@@ -50,19 +50,19 @@ const RoomEditorToolBar = ({ language, setLanguage ,roomId ,theme ,setTheme}) =>
 
   
     return (
-     <div className="flex items-center justify-between px-6 py-3 bg-zinc-900 border-b border-zinc-800">
+     <div className="flex items-center justify-between px-6 py-3 bg-surface-container-low border-b border-outline-variant/10">
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-8 h-8 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-          <Code2 className="w-5 h-5 text-emerald-500" />
+        <div className="flex items-center justify-center w-8 h-8 bg-primary-container/10 rounded-lg border border-primary-container/20">
+          <Code2 className="w-5 h-5 text-primary-container" />
         </div>
         <div className="flex flex-col">
-          <h1 className="text-lg font-bold  tracking-tight ">
+          <h1 className="text-lg font-bold tracking-tight font-headline">
             <ShinyText
   text="DevHive"
   speed={2.3}
   delay={0}
   color="#F4F4F5"
-  shineColor="#059669"
+  shineColor="#00ffa3"
   spread={120}
   direction="left"
   yoyo={false}
@@ -70,7 +70,7 @@ const RoomEditorToolBar = ({ language, setLanguage ,roomId ,theme ,setTheme}) =>
   disabled={false}
 />      
        </h1>
-          {/* <span className="text-xs text-emerald-500 font-medium mt-1">Live Room: {roomId.slice(0, 8)}...</span> */}
+          {/* <span className="text-xs text-primary-container font-medium mt-1">Live Room: {roomId.slice(0, 8)}...</span> */}
         </div>
       </div>
 
@@ -83,33 +83,33 @@ const RoomEditorToolBar = ({ language, setLanguage ,roomId ,theme ,setTheme}) =>
           theme={theme}
           setTheme={setTheme}
         />
-        <div className="h-6 w-px bg-zinc-700 mx-1"></div> {/* Divider */}
+        <div className="h-6 w-px bg-outline-variant/40 mx-1"></div> {/* Divider */}
   
           {/* <button className="bg-blue-600 hover:bg-blue-700 px-3 py-1 text-sm rounded text-white">
             Run
           </button> */}
           <Dialog>
            <DialogTrigger asChild>
-                      <Button className="bg-emerald-600 hover:bg-emerald-700 text-black gap-2 border-0">
+                      <Button className="bg-primary-container hover:bg-primary-fixed-dim text-on-primary-container gap-2 border-0">
                         <Users className="w-4 h-4" />
                         Invite
                       </Button>
                     </DialogTrigger>
-          <DialogContent className="bg-zinc-900 border-zinc-800 text-zinc-100 sm:max-w-md">
+          <DialogContent className="bg-surface-container-low border-outline-variant/10 text-on-surface sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-xl">Room Invite Link</DialogTitle>
-              <DialogDescription className="text-zinc-400 pt-2 pb-4">
+              <DialogTitle className="text-xl font-headline">Room Invite Link</DialogTitle>
+              <DialogDescription className="text-on-surface-variant pt-2 pb-4">
                 Share this link with your team to collaborate in real-time.
               </DialogDescription>
               <Field className="space-y-2">
-                <FieldLabel className="text-zinc-300">Invite URL</FieldLabel>
+                <FieldLabel className="text-on-surface-variant">Invite URL</FieldLabel>
                 <div className="flex gap-2">
                   <Input 
                     readOnly 
                     value={link} 
-                    className="bg-zinc-950 border-zinc-800 text-zinc-300 focus-visible:ring-emerald-500"
+                    className="bg-surface-container-lowest border-outline-variant/10 text-on-surface-variant focus-visible:ring-primary-container"
                   />
-                  <Button onClick={()=>copyCode()} className="bg-zinc-800 hover:bg-zinc-700 text-white px-3">
+                  <Button onClick={()=>copyCode()} className="bg-surface-container-high hover:bg-surface-bright text-on-surface px-3">
                     <Copy className="w-4 h-4" />
                   </Button>
                 </div>
