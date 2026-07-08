@@ -15,7 +15,7 @@ const DefaultPage = () => {
   };
 
   return (
-   <div className="h-screen flex flex-col bg-zinc-950 text-zinc-100 overflow-hidden">
+   <div className="h-screen flex flex-col bg-background text-on-surface overflow-hidden">
       <EditorToolBar
         language={language}
         setLanguage={setLanguage}

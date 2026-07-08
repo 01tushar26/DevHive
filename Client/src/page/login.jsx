@@ -1,4 +1,3 @@
-
 import React from 'react'
 import { useRef } from 'react'
 import { toast } from 'sonner'
@@ -38,7 +37,7 @@ function Login() {
         const accessToken  = response.data.data.accessToken;
         localStorage.setItem("accessToken",accessToken)
         toast.success("Login Successfully !!")
-         setTimeout(() => navigate("/"), 1000)
+         setTimeout(() => navigate("/editor"), 1000)
         
          
 
@@ -66,8 +65,8 @@ function Login() {
   <div className="absolute inset-0 flex justify-center items-center px-8 py-10">
   <Card className="w-full max-w-sm bg-black/60 backdrop-blur-sm  px-5 py-10">
     <CardHeader className="text-center pb-2">
-      <CardTitle className="text-white text-2xl font-bold"> Welcome Back to DevHive</CardTitle>
-      <CardDescription className="text-emerald-500 uppercase tracking-widest text-xs">
+      <CardTitle className="text-on-surface text-2xl font-bold font-headline"> Welcome Back to DevHive</CardTitle>
+      <CardDescription className="text-primary-container uppercase tracking-widest text-xs">
         Log in to your hive and start collaborating
       </CardDescription>
     </CardHeader>
@@ -75,17 +74,17 @@ function Login() {
     <CardContent className="flex flex-col gap-4">
       {/* Email Field */}
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="username" className="text-zinc-100 uppercase text-xs tracking-wider">
+        <Label htmlFor="username" className="text-on-surface uppercase text-xs tracking-wider">
           Email Address
         </Label>
         <div className="relative">
-          {/* <span className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500 text-sm">@</span> */}
+          {/* <span className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-container text-sm">@</span> */}
           <Input
             ref={usernameRef}
             id="username"
             type="text"
             
-            className="bg-zinc-900/80 border-zinc-700 text-white placeholder:text-zinc-600 pl-4 py-4 focus-visible:ring-emerald-600"
+            className="bg-surface-container/80 border-outline-variant/30 text-on-surface placeholder:text-outline pl-4 py-4 focus-visible:ring-primary-container"
           />
         </div>
       </div>
@@ -93,21 +92,21 @@ function Login() {
       {/* Password Field */}
       <div className="flex flex-col gap-1.5">
         <div className="flex justify-between items-center">
-          <Label htmlFor="password" className="text-zinc-100 uppercase text-xs tracking-wider">
+          <Label htmlFor="password" className="text-on-surface uppercase text-xs tracking-wider">
             Password
           </Label>
-          {/* <span className="text-emerald-500 text-xs cursor-pointer hover:text-emerald-400">
+          {/* <span className="text-primary-container text-xs cursor-pointer hover:text-primary-fixed-dim">
             Forgot Password?
           </span> */}
         </div>
         <div className="relative">
-          {/* <span className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500 text-sm">🔒</span> */}
+          {/* <span className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-container text-sm">🔒</span> */}
           <Input
             ref={passwordRef}
             id="password"
             type="password"
            
-            className="bg-zinc-900/80 px-4 py-4  border-zinc-700 text-white placeholder:text-zinc-600  focus-visible:ring-emerald-600"
+            className="bg-surface-container/80 px-4 py-4  border-outline-variant/30 text-on-surface placeholder:text-outline  focus-visible:ring-primary-container"
           />
         </div>
       </div>
@@ -115,14 +114,14 @@ function Login() {
 
    
     <Button
-        className="w-full bg-emerald-600 hover:bg-emerald-700 text-black"
+        className="w-full bg-primary-container hover:bg-primary-fixed-dim text-on-primary-container"
         onClick={() => handleLogin()}
       >
         Log In
       </Button>
-      <p className="text-zinc-600 text-xs text-center">
+      <p className="text-outline text-xs text-center">
         Don't have an account?{' '}
-       <Link to="/signup" className="text-emerald-600 cursor-pointer hover:text-emerald-700">
+       <Link to="/signup" className="text-primary-container cursor-pointer hover:text-primary-fixed-dim">
         Sign Up
       </Link>
       </p>

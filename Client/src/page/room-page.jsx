@@ -31,7 +31,7 @@ const RoomPage = () => {
             setRoomClosed(true)
             toast.error("This room has been closed.")
 
-            setTimeout(() => navigate("/"), 1000)
+            setTimeout(() => navigate("/editor"), 1000)
             return
           }
           setCode(res.data.data.code)
@@ -39,7 +39,7 @@ const RoomPage = () => {
       } catch (error) {
           const message = error.response?.data?.error?.message || "Failed to load room."
           toast.error(message)
-        setTimeout(() => navigate("/"), 3000)
+        setTimeout(() => navigate("/editor"), 3000)
       }
     }
     getRoomCode()
@@ -88,7 +88,7 @@ const RoomPage = () => {
   
 
  return (
-    <div className="h-screen flex flex-col bg-[#0e1115]">
+    <div className="h-screen flex flex-col bg-background">
       <RoomEditorToolBar
         language={language}
         setLanguage={setLanguage}
