@@ -26,7 +26,7 @@ export const connectSocket = (roomId, onMessageReceived) => {
           
           toast.error("The room has been closed by the host")
 
-          window.location.href = 'http://localhost:5173/';
+          window.location.href = 'http://localhost:5173/editor';
         } 
           onMessageReceived(data);
       });
