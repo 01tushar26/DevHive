@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -5,77 +6,54 @@
 
 @custom-variant dark (&:is(.dark *));
 
-:root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.809 0.105 251.813);
-    --chart-2: oklch(0.623 0.214 259.815);
-    --chart-3: oklch(0.546 0.245 262.881);
-    --chart-4: oklch(0.488 0.243 264.376);
-    --chart-5: oklch(0.424 0.199 265.638);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
-}
-
+/*
+  DevHive is a single always-dark brand, not a light/dark toggle,
+  so both :root and .dark resolve to the same neon palette. This keeps
+  every other shadcn component (buttons, inputs, cards on other pages)
+  working with the same semantic names, just recolored to match the brand.
+*/
+:root,
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.809 0.105 251.813);
-    --chart-2: oklch(0.623 0.214 259.815);
-    --chart-3: oklch(0.546 0.245 262.881);
-    --chart-4: oklch(0.488 0.243 264.376);
-    --chart-5: oklch(0.424 0.199 265.638);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+    --background: #0e0e0e;
+    --foreground: #ffffff;
+    --card: #131313;
+    --card-foreground: #ffffff;
+    --popover: #1a1919;
+    --popover-foreground: #ffffff;
+    --primary: #00ffa3;
+    --primary-foreground: #005c38;
+    --secondary: #00e3fd;
+    --secondary-foreground: #004d57;
+    --muted: #201f1f;
+    --muted-foreground: #adaaaa;
+    --accent: #262626;
+    --accent-foreground: #ffffff;
+    --destructive: #ff716c;
+    --border: rgba(255, 255, 255, 0.1);
+    --input: rgba(255, 255, 255, 0.15);
+    --ring: #00ffa3;
+    --chart-1: #00ffa3;
+    --chart-2: #00e3fd;
+    --chart-3: #72dcff;
+    --chart-4: #00d2ff;
+    --chart-5: #26e6ff;
+    --radius: 0.5rem;
+    --sidebar: #131313;
+    --sidebar-foreground: #ffffff;
+    --sidebar-primary: #00ffa3;
+    --sidebar-primary-foreground: #005c38;
+    --sidebar-accent: #201f1f;
+    --sidebar-accent-foreground: #ffffff;
+    --sidebar-border: rgba(255, 255, 255, 0.1);
+    --sidebar-ring: #00ffa3;
 }
 
 @theme inline {
     --font-sans: 'Geist Variable', sans-serif;
+    --font-headline: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-label: 'Inter', sans-serif;
+
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -114,6 +92,41 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+
+    /* --- DevHive-specific tokens used by Home.jsx (not part of stock shadcn) --- */
+    --color-surface: #0e0e0e;
+    --color-surface-dim: #0e0e0e;
+    --color-surface-bright: #2c2c2c;
+    --color-surface-container-lowest: #000000;
+    --color-surface-container-low: #131313;
+    --color-surface-container: #1a1919;
+    --color-surface-container-high: #201f1f;
+    --color-surface-container-highest: #262626;
+    --color-surface-variant: #262626;
+    --color-on-surface: #ffffff;
+    --color-on-surface-variant: #adaaaa;
+    --color-outline: #777575;
+    --color-outline-variant: #494847;
+
+    --color-primary-container: #00ffa3;
+    --color-primary-fixed: #00ffa3;
+    --color-primary-fixed-dim: #00ef99;
+    --color-on-primary-container: #005c38;
+    --color-on-primary-fixed: #00472a;
+
+    --color-tertiary: #72dcff;
+    --color-tertiary-dim: #00c3ed;
+    --color-tertiary-container: #00d2ff;
+    --color-on-tertiary: #004c5e;
+    --color-on-tertiary-container: #004252;
+
+    --color-on-secondary: #004d57;
+    --color-on-secondary-container: #e8fbff;
+
+    --color-error: #ff716c;
+    --color-error-container: #9f0519;
+    --color-on-error: #490006;
+    --color-on-error-container: #ffa8a3;
 }
 
 @layer base {
@@ -126,4 +139,16 @@
   html {
     @apply font-sans;
     }
+}
+
+@layer utilities {
+  .font-headline {
+    font-family: var(--font-headline);
+  }
+  .neon-glow {
+    text-shadow: 0 0 10px rgba(0, 255, 163, 0.4);
+  }
+  .primary-gradient {
+    background: linear-gradient(135deg, #b1ffce 0%, #00ffa3 100%);
+  }
 }

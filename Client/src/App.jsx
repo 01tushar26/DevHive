@@ -7,6 +7,7 @@ import RoomPage from './page/room-page'
 import JoinPage from './page/join-page'
 import Login from './page/login'
 import SignUp from './page/signup-page'
+import Home from './page/home'
 
 function App() {
   
@@ -14,7 +15,8 @@ function App() {
     <>
     <BrowserRouter>
      <Routes>
-      <Route path='/' element = {<DefaultPage/>}></Route>
+      <Route path='/editor' element = {<DefaultPage/>}></Route>
+      <Route path='/' element = {<Home/>}></Route>
       <Route path='/login' element = {<Login/>}></Route>
       <Route path='/signup' element = {<SignUp/>}></Route>
       <Route path='/room/:roomId' element = {<RoomPage/>}></Route>
