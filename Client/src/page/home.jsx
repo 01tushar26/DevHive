@@ -13,6 +13,10 @@ import { motion, useReducedMotion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import DecryptedText from "@/components/DecryptedText";
+import { useNavigate } from "react-router-dom";
+import { JoinViaLink } from "@/components/JoinViaLink";
+
+
 
 const collaborators = [
   {
@@ -84,6 +88,7 @@ const heroItem = {
 export default function Home() {
   const shouldReduceMotion = useReducedMotion();
   const initial = shouldReduceMotion ? "show" : "hidden";
+  const navigate = useNavigate();
 
   return (
     <div className="bg-background text-on-surface selection:bg-primary-container selection:text-on-primary-container overflow-x-hidden">
@@ -110,8 +115,8 @@ export default function Home() {
               </a>
             ))}
           </nav>
-          <Button variant="default" size="sm">
-            Join Room
+          <Button variant="default" size="sm" onClick={()=>navigate("/signup")}>
+            Sign Up
           </Button>
         </div>
       </header>
@@ -164,10 +169,14 @@ export default function Home() {
               variants={heroItem}
               className="flex flex-col sm:flex-row gap-6 justify-center items-center"
             >
-              <Button size="xl">Create a Room</Button>
-              <Button variant="outline" size="xl">
+              <Button size="xl" onClick={() => navigate("/editor")}>Get Started</Button>
+
+              {/* <Button variant="outline" size="xl">
                 Join via Link
-              </Button>
+              </Button> */}
+              <JoinViaLink/>
+
+
             </motion.div>
           </div>
 

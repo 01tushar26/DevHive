@@ -53,6 +53,7 @@ function SignUp() {
      catch(error){
        const message=error.response?.data?.error?.message || "Server Down";
         toast.error(message + " !!")
+        // setTimeout(() => navigate("/login"), 1000)
 
      }
 

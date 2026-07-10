@@ -13,9 +13,7 @@ const JoinPage = () => {
       if (!roomId) return
 
       try {
-        const response = await axiosInstance.post(`/rooms/${roomId}/join`, {
-          userName: "Tushar"
-        })
+        const response = await axiosInstance.post(`/rooms/${roomId}/join`)
 
         if (response.status === 200) {
 

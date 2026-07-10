@@ -12,8 +12,9 @@ const axiosInstance = axios.create({
 // Attach the accessToken to every outgoing request
 axiosInstance.interceptors.request.use(
   (config) => {
+     const isAuthRoute = config.url?.startsWith('/auth/');
     const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
+    if (accessToken && !isAuthRoute) {
       config.headers['Authorization'] = `Bearer ${accessToken}`;
     }
     return config;
@@ -25,7 +26,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => {
     //todo-remove that
-    console.log("Response received:", response);
+    
     return response;
   },
 
@@ -50,7 +51,7 @@ axiosInstance.interceptors.response.use(
 
         localStorage.setItem('accessToken', res.data.data.accessToken);
         originalRequest.headers['Authorization'] = `Bearer ${res.data.data.accessToken}`;
-        console.log("String",res);
+        
         return axiosInstance(originalRequest); // retry original request
 
       } catch (err) {

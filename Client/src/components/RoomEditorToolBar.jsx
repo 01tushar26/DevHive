@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import LanguageSelector from './LanguageSelector'
 import ThemeSelector from './ThemeSelector'
-import { Code2, Copy, LogOut, Users } from 'lucide-react'
+import { Code2, Copy, Link2, LogOut, Users } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
 import { Button } from './ui/button'
 import { Field, FieldLabel } from './ui/field'
@@ -52,9 +52,11 @@ const RoomEditorToolBar = ({ language, setLanguage ,roomId ,theme ,setTheme}) =>
     return (
      <div className="flex items-center justify-between px-6 py-3 bg-surface-container-low border-b border-outline-variant/10">
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-8 h-8 bg-primary-container/10 rounded-lg border border-primary-container/20">
-          <Code2 className="w-5 h-5 text-primary-container" />
-        </div>
+       <div className="flex items-center gap-2">
+    <span className="w-3 h-3 rounded-full bg-[#ff5f57]"></span>
+    <span className="w-3 h-3 rounded-full bg-[#febc2e]"></span>
+    <span className="w-3 h-3 rounded-full bg-[#28c840]"></span>
+  </div>
         <div className="flex flex-col">
           <h1 className="text-lg font-bold tracking-tight font-headline">
             <ShinyText
@@ -89,34 +91,67 @@ const RoomEditorToolBar = ({ language, setLanguage ,roomId ,theme ,setTheme}) =>
             Run
           </button> */}
           <Dialog>
-           <DialogTrigger asChild>
-                      <Button className="bg-primary-container hover:bg-primary-fixed-dim text-on-primary-container gap-2 border-0">
-                        <Users className="w-4 h-4" />
-                        Invite
-                      </Button>
-                    </DialogTrigger>
-          <DialogContent className="bg-surface-container-low border-outline-variant/10 text-on-surface sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-headline">Room Invite Link</DialogTitle>
-              <DialogDescription className="text-on-surface-variant pt-2 pb-4">
-                Share this link with your team to collaborate in real-time.
-              </DialogDescription>
-              <Field className="space-y-2">
-                <FieldLabel className="text-on-surface-variant">Invite URL</FieldLabel>
-                <div className="flex gap-2">
-                  <Input 
-                    readOnly 
-                    value={link} 
-                    className="bg-surface-container-lowest border-outline-variant/10 text-on-surface-variant focus-visible:ring-primary-container"
-                  />
-                  <Button onClick={()=>copyCode()} className="bg-surface-container-high hover:bg-surface-bright text-on-surface px-3">
-                    <Copy className="w-4 h-4" />
-                  </Button>
-                </div>
-              </Field>
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
+  <DialogTrigger asChild>
+    <Button className="bg-primary-container hover:bg-primary-fixed-dim text-on-primary-container gap-2 border-0">
+      <Users className="w-4 h-4" />
+      Invite
+    </Button>
+  </DialogTrigger>
+
+  <DialogContent className="sm:max-w-md bg-surface-container-low border border-outline-variant/10 rounded-xl shadow-2xl overflow-hidden p-0 gap-0 text-on-surface">
+    {/* Fake window chrome, echoing the editor mockup */}
+    <div className="flex items-center justify-between px-4 py-3 bg-surface-container-high">
+      <div className="flex gap-2">
+        <div className="w-3 h-3 rounded-full bg-error/30" />
+        <div className="w-3 h-3 rounded-full bg-primary-container/30" />
+        <div className="w-3 h-3 rounded-full bg-secondary/30" />
+      </div>
+      <div className="text-xs font-label text-on-surface-variant uppercase tracking-widest">
+        invite-link.js
+      </div>
+      <div className="w-12" />
+    </div>
+
+    <div className="p-6">
+      <DialogHeader>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-9 h-9 rounded-lg bg-primary-container/10 flex items-center justify-center shrink-0">
+            <Link2 className="text-primary-container" size={18} />
+          </div>
+          <DialogTitle className="text-2xl font-headline font-bold tracking-tight">
+            Room Invite Link
+          </DialogTitle>
+        </div>
+        <DialogDescription className="text-on-surface-variant font-body leading-relaxed">
+          Share this link with your team to collaborate in real-time.
+        </DialogDescription>
+      </DialogHeader>
+
+      <Field className="space-y-2 pt-6">
+        <FieldLabel className="text-xs font-label uppercase tracking-widest text-on-surface-variant">
+          Invite URL
+        </FieldLabel>
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Input
+              readOnly
+              value={link}
+              className="w-full bg-surface-container rounded-lg border border-outline-variant/20 px-4 py-3 font-mono text-sm text-on-surface placeholder:text-outline focus-visible:ring-1 focus-visible:ring-primary-container/50 focus:border-primary-container/50 transition-all"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-primary-container/60 animate-pulse" />
+          </div>
+          <Button
+            onClick={() => copyCode()}
+            size="xl"
+            className="px-4 gap-2 shrink-0"
+          >
+            <Copy className="w-4 h-4" />
+          </Button>
+        </div>
+      </Field>
+    </div>
+  </DialogContent>
+</Dialog>
 
           <Button 
           onClick={()=>deleteRoom()} 
