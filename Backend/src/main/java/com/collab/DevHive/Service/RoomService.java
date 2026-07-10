@@ -7,8 +7,8 @@ import com.collab.DevHive.DTO.UpdateCodeRequestDto;
 
 public interface RoomService {
 
-    RoomResponseDto createRoom(RoomRequestDto dto);
-    LeaveJoinRoomResponseDto joinRoom(String roomID, String userName);
+    RoomResponseDto createRoom();
+    LeaveJoinRoomResponseDto joinRoom(String roomID);
     RoomResponseDto getRoom(String roomID);
 //    void updateCode(String roomId, String dto);
     RoomResponseDto endRoom(String roomId);

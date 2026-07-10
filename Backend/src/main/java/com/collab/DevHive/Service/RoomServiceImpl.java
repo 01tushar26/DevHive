@@ -42,10 +42,10 @@ public class RoomServiceImpl implements RoomService{
 
     @Override
     @Transactional
-    public RoomResponseDto createRoom(RoomRequestDto dto ) {
+    public RoomResponseDto createRoom() {
         User currentUser = getAuthenticatedUser();
 
-        log.info("Creating room with owner : {}",dto.getUserName());
+        log.info("Creating room with owner : {}",currentUser.getName());
         Room newRoom = new Room();
         newRoom.setOwner(currentUser);
 
@@ -84,7 +84,7 @@ public class RoomServiceImpl implements RoomService{
     }
     @Override
     @Transactional
-    public LeaveJoinRoomResponseDto joinRoom(String roomID, String userName) {
+    public LeaveJoinRoomResponseDto joinRoom(String roomID) {
         User currentUser = getAuthenticatedUser();
 
         Room room = roomRepository.findByIdWithLock(roomID)

@@ -21,8 +21,8 @@ public class RoomController {
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     @PostMapping
-    public ResponseEntity<RoomResponseDto> createRoom(@RequestBody RoomRequestDto dto){
-        RoomResponseDto responseDto = service.createRoom(dto);
+    public ResponseEntity<RoomResponseDto> createRoom(){
+        RoomResponseDto responseDto = service.createRoom();
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
@@ -33,8 +33,8 @@ public class RoomController {
 //    }
 
     @PostMapping("/{roomId}/join")
-    public ResponseEntity<RoomResponseDto> joinRoom(@PathVariable(name = "roomId") String id , @RequestBody RoomRequestDto dto){
-        LeaveJoinRoomResponseDto leaveJoinRoomResponseDto = service.joinRoom(id, dto.getUserName());
+    public ResponseEntity<RoomResponseDto> joinRoom(@PathVariable(name = "roomId") String id){
+        LeaveJoinRoomResponseDto leaveJoinRoomResponseDto = service.joinRoom(id);
 
         // this will to tell the left participants that that user is left the room
         simpMessagingTemplate.convertAndSend(
