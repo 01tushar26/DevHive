@@ -44,6 +44,7 @@ public class WebSecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers( "/auth/**").permitAll()
                                 .requestMatchers("/rooms/**").authenticated()
 //                                .requestMatchers("/ws/**").authenticated()
 

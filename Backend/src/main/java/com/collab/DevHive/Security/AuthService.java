@@ -38,7 +38,7 @@ public class AuthService {
     public UserDTO signupUser(SignUpRequestDTO signUpRequestDTO){
 
        if(userRepo.existsByEmail(signUpRequestDTO.getEmail())){
-           throw new RuntimeException("User is already exist !!");
+           throw new RuntimeException("User is already exist ");
        }
         User newUser = mapper.map(signUpRequestDTO,User.class);
         newUser.setPassword(passwordEncoder.encode(signUpRequestDTO.getPassword()));
