@@ -9,6 +9,7 @@ import {
   MousePointer2,
 } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
+import editor from "@/assets/editor.png";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -188,44 +189,14 @@ export default function Home() {
             variants={heroItem}
             className="relative w-full max-w-6xl mt-24 mx-auto perspective-1000"
           >
-            <div className="bg-surface-container-low rounded-xl border border-outline-variant/10 shadow-2xl overflow-hidden translate-y-12">
-              <div className="flex items-center justify-between px-4 py-3 bg-surface-container-high">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-error/30" />
-                  <div className="w-3 h-3 rounded-full bg-primary-container/30" />
-                  <div className="w-3 h-3 rounded-full bg-secondary/30" />
-                </div>
-                <div className="text-xs font-label text-on-surface-variant uppercase tracking-widest">
-                  devhive-room-42.js
-                </div>
-                <div className="w-12" />
-              </div>
-              <div className="flex h-96">
-                <div className="w-12 bg-surface-container text-outline text-[10px] py-4 text-center select-none font-mono">
-                  {Array.from({ length: 11 }, (_, i) => (
-                    <div key={i}>{i + 1}</div>
-                  ))}
-                </div>
-                <div className="flex-1 p-6 font-mono text-sm leading-relaxed text-on-surface-variant">
-                  {codeLines.map((line, i) => (
-                    <div key={i} className={cn("mb-1", line.indent === 1 && "ml-4")}>
-                      {line.node}
-                    </div>
-                  ))}
-                  <div className="mb-1 ml-4 text-on-surface bg-primary-container/10 border-l-2 border-primary-container px-2 py-0.5 relative">
-                    return result.sort((a, b) =&gt; a - b);
-                    <span className="absolute -right-20 top-0 bg-secondary text-on-secondary px-2 py-0.5 text-[10px] rounded flex items-center gap-1 font-sans">
-                      <MousePointer2 size={12} />
-                      Sarah
-                    </span>
-                  </div>
-                  <div className="mb-1">{"}"}</div>
-                  <div className="mt-8">
-                    <span className="text-outline-variant italic">// What's next?</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+
+            <img
+     alt="My product screenshot"
+     className="rounded-2xl border border-outline-variant/20 shadow-2xl relative z-10"
+     src={editor}
+   />
+            
+          
           </motion.div>
         </section>
 
@@ -299,7 +270,7 @@ export default function Home() {
                 Pipeline
               </h2>
               <h3 className="text-5xl md:text-6xl font-headline font-bold mb-8">
-                What's <span className="italic">Buzzing</span> Next
+                What's Buzzing Next
               </h3>
               <p className="text-on-surface-variant text-xl leading-relaxed mb-10">
                 We're constantly expanding the hive. Here's what our engineers are currently
@@ -339,11 +310,10 @@ export default function Home() {
             Ready to enter the Hive?
           </h2>
           <p className="text-on-surface-variant text-xl max-w-2xl mx-auto mb-12">
-            Join thousands of developers coding in harmony. Free for students and teams up to 5
-            members.
+            Join developers coding in sync. 
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button size="xl">Get Started Free</Button>
+            <Button size="xl" onClick={()=>navigate("/editor")}>Get Started Free</Button>
             <Button variant="outline" size="xl" className="bg-surface-container-highest hover:bg-surface-bright">
               View Demo
             </Button>
@@ -359,7 +329,7 @@ export default function Home() {
               DevHive
             </span>
             <p className="text-neutral-500 text-sm font-body uppercase tracking-widest">
-              © 2024 DevHive. Built for the Neon Architect.
+              © 2026 DevHive. Built for the Neon Architect.
             </p>
           </div>
           <div className="flex gap-8">

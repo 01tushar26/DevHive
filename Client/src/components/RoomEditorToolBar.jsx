@@ -106,8 +106,8 @@ const RoomEditorToolBar = ({ language, setLanguage ,roomId ,theme ,setTheme}) =>
         <div className="w-3 h-3 rounded-full bg-primary-container/30" />
         <div className="w-3 h-3 rounded-full bg-secondary/30" />
       </div>
-      <div className="text-xs font-label text-on-surface-variant uppercase tracking-widest">
-        invite-link.js
+      <div className="text-xs font-label text-on-surface-variant tracking-widest">
+        DevHive
       </div>
       <div className="w-12" />
     </div>
@@ -123,32 +123,33 @@ const RoomEditorToolBar = ({ language, setLanguage ,roomId ,theme ,setTheme}) =>
           </DialogTitle>
         </div>
         <DialogDescription className="text-on-surface-variant font-body leading-relaxed">
-          Share this link with your team to collaborate in real-time.
+          Share this room link with your team to collaborate in real-time.
         </DialogDescription>
       </DialogHeader>
 
-      <Field className="space-y-2 pt-6">
-        <FieldLabel className="text-xs font-label uppercase tracking-widest text-on-surface-variant">
-          Invite URL
-        </FieldLabel>
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Input
-              readOnly
-              value={link}
-              className="w-full bg-surface-container rounded-lg border border-outline-variant/20 px-4 py-3 font-mono text-sm text-on-surface placeholder:text-outline focus-visible:ring-1 focus-visible:ring-primary-container/50 focus:border-primary-container/50 transition-all"
-            />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-primary-container/60 animate-pulse" />
-          </div>
-          <Button
-            onClick={() => copyCode()}
-            size="xl"
-            className="px-4 gap-2 shrink-0"
-          >
-            <Copy className="w-4 h-4" />
-          </Button>
-        </div>
-      </Field>
+      <Field className="space-y-3 pt-6">
+  <FieldLabel className="text-xs font-label uppercase tracking-widest text-on-surface-variant">
+    Invite URL
+  </FieldLabel>
+
+  <div className="relative">
+    <Input
+      readOnly
+      value={link}
+      className="w-full bg-surface-container rounded-lg border border-outline-variant/20 px-4 py-3 font-mono text-sm text-on-surface placeholder:text-outline focus-visible:ring-1 focus-visible:ring-primary-container/50 focus:border-primary-container/50 transition-all truncate"
+    />
+    <span className="absolute right-3 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-primary-container/60 animate-pulse" />
+  </div>
+
+  <Button
+    onClick={() => copyCode()}
+    size="xl"
+    className="w-full rounded-full gap-2"
+  >
+    <Copy className="w-4 h-4" />
+    Copy Link
+  </Button>
+</Field>
     </div>
   </DialogContent>
 </Dialog>
