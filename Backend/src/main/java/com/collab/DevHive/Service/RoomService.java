@@ -15,5 +15,5 @@ public interface RoomService {
     LeaveJoinRoomResponseDto leaveRoom(String roomId);
 
 
-
+    void langUpdate(String roomId, String language);
 }

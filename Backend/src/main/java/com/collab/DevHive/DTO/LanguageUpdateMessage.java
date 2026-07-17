@@ -3,9 +3,11 @@ package com.collab.DevHive.DTO;
 import lombok.Data;
 
 @Data
-public class CodeUpdateMessage {
+public class LanguageUpdateMessage {
+
     private String roomId;
-    private String code;
+    private String language;
     private String username;
-    private final String message = "CODE_UPDATE";
+    private final String message = "LANG_UPDATE";
+
 }

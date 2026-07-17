@@ -20,6 +20,7 @@ public class RoomResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String code;
+    private String language;
     private UserDTO owner;
 //    private String ownerUsername;
     private RoomsStatus status;

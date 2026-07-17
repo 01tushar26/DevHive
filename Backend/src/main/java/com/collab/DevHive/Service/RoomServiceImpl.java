@@ -53,7 +53,7 @@ public class RoomServiceImpl implements RoomService{
 //        newRoom.setOwnerUsername(currentUser.getName());
         newRoom.setStatus(RoomsStatus.ACTIVE);
         newRoom.setCode("// Start coding");
-
+        newRoom.setLanguage("javascript");
         RoomParticipant roomParticipant = new RoomParticipant();
         roomParticipant.setUser(currentUser);
         roomParticipant.setRole(ParticipantsRoles.OWNER);
@@ -252,6 +252,13 @@ public class RoomServiceImpl implements RoomService{
         RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_LEFT");
         return new LeaveJoinRoomResponseDto(mapper.map(room,RoomResponseDto.class),eventDto);
 
+    }
+
+    @Override
+    public void langUpdate(String roomId, String language) {
+        Room room = roomRepository.findById(roomId).orElseThrow(()->new ResourceNotFoundException("Room is not found with id "+roomId));
+        room.setLanguage(language);
+        roomRepository.save(room);
     }
 
     // basically to put the code in redis

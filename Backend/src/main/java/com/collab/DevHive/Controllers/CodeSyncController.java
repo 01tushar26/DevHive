@@ -2,7 +2,9 @@ package com.collab.DevHive.Controllers;
 
 import com.collab.DevHive.DTO.CodeUpdateMessage;
 
+import com.collab.DevHive.DTO.LanguageUpdateMessage;
 import com.collab.DevHive.Service.RedisService.RedisMessagePublisher;
+import com.collab.DevHive.Service.RoomService;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,7 @@ public class CodeSyncController {
     private final StringRedisTemplate template;
     private final RedisMessagePublisher publisher;
     private final ObjectMapper objectMapper;
+    private final RoomService service;
 
 
 
@@ -57,6 +60,25 @@ public class CodeSyncController {
             publisher.publish(json);
         } catch (Exception e) {
             log.error("Failed to publish code update for room {}: {}", roomId, e.getMessage());
+        }
+    }
+
+    @MessageMapping("/lang-update/{roomId}")
+    public void handleLanguageUpdate(
+            @DestinationVariable String roomId,
+            @Payload LanguageUpdateMessage message
+
+    ) {
+
+        service.langUpdate(roomId,message.getLanguage());
+
+        try {
+            // Make sure roomId is in the message so subscriber knows the topic
+            message.setRoomId(roomId);
+            String json = objectMapper.writeValueAsString(message);
+            publisher.publish(json);
+        } catch (Exception e) {
+            log.error("Failed to publish language update for room {}: {}", roomId, e.getMessage());
         }
     }
 }
