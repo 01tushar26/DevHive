@@ -52,6 +52,14 @@ export const sendCodeUpdate = (roomId, code, username = "anonymous") => {
     });
   }
 };
+export const sendLanguageUpdate = (roomId, language, username = "anonymous") => {
+  if (stompClient && stompClient.connected) {
+    stompClient.publish({
+      destination: `/app/lang-update/${roomId}`,   
+      body: JSON.stringify({ roomId, language, username }),
+    });
+  }
+};
 //when you delete the room this function disconnect the websocket persistence connection
 export const disconnectSocket = () => {
   if (stompClient) {

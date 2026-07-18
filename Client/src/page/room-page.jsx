@@ -3,7 +3,7 @@ import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState ,useRef,useEffect} from 'react';
 import CodeEditor from '@/components/CodeEditor';
-import { connectSocket,sendCodeUpdate,disconnectSocket } from '@/Websockets/socket';
+import { connectSocket,sendCodeUpdate,disconnectSocket, sendLanguageUpdate } from '@/Websockets/socket';
 import { toast  } from 'sonner';
 import axios from 'axios';
 import axiosInstance from '@/lib/axios-instance';
@@ -21,6 +21,7 @@ const RoomPage = () => {
     const {roomId } = useParams()
     const username = "Tushar"; // later auth-based
     const isRemoteUpdate = useRef(false);
+    const isRemoteLanguageUpdate = useRef(false);
 
      useEffect(() => {
     async function getRoomCode() {
@@ -35,6 +36,7 @@ const RoomPage = () => {
             return
           }
           setCode(res.data.data.code)
+          setLanguage(res.data.data.language)
         }
       } catch (error) {
           const message = error.response?.data?.error?.message || "Failed to load room."
@@ -62,11 +64,20 @@ const RoomPage = () => {
     } else if(data.message == "USER_REJOIN") {
       toast.success(`${data.userName} rejoined the room !!`);
     }
-    else {
-        
-        ('updating code .....')
+    else if(data.message == "CODE_UPDATE"){
+      ('updating code .....')
         isRemoteUpdate.current = true;  // 
         setCode(data.code);
+    }
+    else if(data.message =="LANG_UPDATE"){
+      
+      isRemoteLanguageUpdate.current=true;
+      setLanguage(data.language);
+      toast.success(` Room language successfully changed !!`);
+    }
+    else {
+        
+        console.warn("Unknown message type received:", data);
     }
     });
      return () => disconnectSocket();
@@ -85,13 +96,23 @@ const RoomPage = () => {
     setCode(newCode);
     sendCodeUpdate(roomId, newCode, username);
   };
+
+  const handlelanguageChange = (newLang) => {
+    if (isRemoteLanguageUpdate.current) {
+      isRemoteLanguageUpdate.current = false;
+      return;
+    }
+
+    setLanguage(newLang);
+    sendLanguageUpdate(roomId, newLang, username);
+  };
   
 
  return (
     <div className="h-screen flex flex-col bg-background">
       <RoomEditorToolBar
         language={language}
-        setLanguage={setLanguage}
+        setLanguage={handlelanguageChange}
         roomId = {roomId}
         theme={theme}
         setTheme={setTheme}
