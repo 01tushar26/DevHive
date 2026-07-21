@@ -39,6 +39,9 @@ public class Room {
     @Column(name = "room_language")
     private String language;
 
+    @Column(name ="vc_active",nullable = false)
+    private boolean vcActive = false;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JsonIgnore
     @JoinColumn(name = "owner_id" , nullable = false)

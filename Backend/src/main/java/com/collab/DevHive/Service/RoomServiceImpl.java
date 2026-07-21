@@ -35,6 +35,7 @@ public class RoomServiceImpl implements RoomService{
     private final RoomRepository roomRepository;
     private final ModelMapper mapper;
     private final StringRedisTemplate redisTemplate;
+    private final LiveKitService liveKitService;
 
 
 
@@ -135,9 +136,8 @@ public class RoomServiceImpl implements RoomService{
             room.setStatus(RoomsStatus.FULL);
         }
 
-
-
         room = roomRepository.save(room);
+
         ensureRedisSeeded(roomID,room.getCode());
         RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_JOIN");
         return new LeaveJoinRoomResponseDto(mapper.map(room,RoomResponseDto.class),eventDto);
@@ -213,6 +213,8 @@ public class RoomServiceImpl implements RoomService{
 
         redisTemplate.delete(ROOM_CODE_KEY + roomId);
         log.info("Redis key deleted for closed room: {}", roomId);
+        //this will delete the livekit vc rooom if exist
+        liveKitService.closeVideoCall(roomId);
 
         return mapper.map(room,RoomResponseDto.class);
     }
@@ -248,6 +250,7 @@ public class RoomServiceImpl implements RoomService{
         }
 
         room = roomRepository.save(room);
+        liveKitService.removeParticipant(roomId, currentUser.getEmail());
 
         RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_LEFT");
         return new LeaveJoinRoomResponseDto(mapper.map(room,RoomResponseDto.class),eventDto);

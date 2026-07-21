@@ -6,5 +6,7 @@ import java.io.IOException;
 
 public interface LiveKitService {
 
-    JoinVideoCallResponseDTO videoCallRequest(String roomId) throws IOException;
+    JoinVideoCallResponseDTO videoCallRequest(String roomId) ;
+    void closeVideoCall(String roomId);
+    void removeParticipant(String roomId, String identity);
 }

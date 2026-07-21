@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -42,7 +43,9 @@ public class LiveKitServiceImpl implements LiveKitService {
 
 
     @Override
-    public JoinVideoCallResponseDTO videoCallRequest(String roomId) throws IOException {
+    @Transactional()
+    public JoinVideoCallResponseDTO videoCallRequest(String roomId)  {
+
 
         User currentUser = getAuthenticatedUser();
         Room room = roomRepo.findById(roomId)
@@ -61,14 +64,27 @@ public class LiveKitServiceImpl implements LiveKitService {
 
            boolean isOwner = roomParticipant.getRole().equals(ParticipantsRoles.OWNER);
 
-        roomServiceClient.createRoom(
-                roomId,
-                600,
-                20)
-                .execute();
+           try {
+               roomServiceClient.createRoom(
+                               roomId,
+                               600,
+                               20)
+                       .execute();
+           }
+           catch (Exception e){
+               throw new RuntimeException("Failed to create room ");
+           }
+
+
+
+        if (!room.isVcActive()) {
+            room.setVcActive(true);
+            roomRepo.save(room);
+        }
+
 
         AccessToken token = new AccessToken(apiKey,apiSecret);
-        token.setIdentity(currentUser.getName());
+        token.setIdentity(currentUser.getEmail());
         token.setName(currentUser.getName());
         if(isOwner){
             token.addGrants(new RoomJoin(true), new RoomName(roomId),new RoomAdmin(true));
@@ -82,5 +98,34 @@ public class LiveKitServiceImpl implements LiveKitService {
         String jwt = token.toJwt();
         String wsURL = serverUrl.replaceFirst("https","wss");
         return new JoinVideoCallResponseDTO(wsURL,jwt);
+    }
+
+    @Override
+    public void closeVideoCall(String roomId)  {
+        try {
+          roomServiceClient.deleteRoom(roomId).execute();
+          log.info("LiveKit room closed for roomId: {}", roomId);
+        }
+        catch (Exception e){
+            log.warn("Could not LiveKit room closed for roomId{}: {}", roomId,e.getMessage());
+
+        }finally {
+            roomRepo.findById(roomId).ifPresent(room -> {
+                room.setVcActive(false);
+                roomRepo.save(room);
+            });
+        }
+    }
+
+    @Override
+    public void removeParticipant(String roomId, String identity) {
+
+       try {
+           roomServiceClient.removeParticipant(roomId,identity).execute();
+           log.info("Removed participant {} from LiveKit room {}", identity, roomId);
+       }
+       catch (Exception e){
+           log.warn("Could not remove participant {} from LiveKit room {}: {}", identity, roomId, e.getMessage());
+       }
     }
 }
