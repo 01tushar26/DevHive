@@ -2,7 +2,9 @@ package com.collab.DevHive.Service;
 
 import com.collab.DevHive.DTO.JoinVideoCallResponseDTO;
 
+import java.io.IOException;
+
 public interface LiveKitService {
 
-    JoinVideoCallResponseDTO videoCallRequest(String roomId);
+    JoinVideoCallResponseDTO videoCallRequest(String roomId) throws IOException;
 }
