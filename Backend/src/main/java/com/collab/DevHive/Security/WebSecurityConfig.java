@@ -46,6 +46,7 @@ public class WebSecurityConfig {
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .requestMatchers( "/auth/**").permitAll()
                                 .requestMatchers("/rooms/**").authenticated()
+                                .requestMatchers("/livekit/**").authenticated()
 //                                .requestMatchers("/ws/**").authenticated()
 
 //                        .requestMatchers("/users/**").authenticated()

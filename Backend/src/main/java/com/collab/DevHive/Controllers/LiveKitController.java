@@ -22,7 +22,7 @@ public class LiveKitController {
     public ResponseEntity<JoinVideoCallResponseDTO> joinVideoCall(@PathVariable (name = "roomId") String roomId){
         try {
             return ResponseEntity.ok( service.videoCallRequest(roomId));
-        } catch (java.io.IOException e) {
+        } catch ( Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -42,7 +42,7 @@ public class LiveKitController {
             );
 
             return ResponseEntity.ok(response);
-        } catch (java.io.IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

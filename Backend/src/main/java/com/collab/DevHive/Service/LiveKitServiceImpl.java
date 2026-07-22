@@ -43,7 +43,7 @@ public class LiveKitServiceImpl implements LiveKitService {
 
 
     @Override
-    @Transactional()
+    @Transactional
     public JoinVideoCallResponseDTO videoCallRequest(String roomId)  {
 
 
