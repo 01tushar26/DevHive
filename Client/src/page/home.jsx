@@ -7,6 +7,7 @@ import {
   PlayCircle,
   Mic,
   MousePointer2,
+  Pen,
 } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import editor from "@/assets/editor.png";
@@ -32,11 +33,7 @@ const collaborators = [
   },
 ];
 
-const codeLines = [
-  { indent: 0, node: <><span className="text-tertiary">async function</span> <span className="text-primary-container">syncAlgorithm</span>(pool) {"{"}</> },
-  { indent: 1, node: <span className="text-outline-variant">// Collaborating in real-time...</span> },
-  { indent: 1, node: <><span className="text-secondary">const</span> result = <span className="text-tertiary">await</span> pool.<span className="text-primary-container">process</span>();</> },
-];
+
 
 const bentoFeatures = [
   {
@@ -44,8 +41,8 @@ const bentoFeatures = [
     bg: "bg-surface-container-high",
     icon: GraduationCap,
     iconColor: "text-secondary",
-    title: "Group DSA Learning",
-    body: "Perfect for collaborative problem-solving and peer reviews. Share optimized solutions instantly.",
+    title: "Mock Interview Rooms",
+    body: "Practice technical interviews with a friend or peer — one interviews, one solves, camera on, code synced live.",
   },
   {
     span: "md:col-span-4",
@@ -62,20 +59,26 @@ const pipelineItems = [
     icon: PlayCircle,
     color: "text-primary-container",
     bg: "bg-primary-container/10",
-    title: "Live Code Execution",
-    body: "Run your code directly in the hive. Support for server-side environments coming Q3.",
+    title: "Real Code Execution",
+    body: "Run your code directly in the hive. No more read-only interviews, see if the solution actually passes.",
   },
-  {
-    icon: Mic,
+ {
+    icon: Pen,
     color: "text-secondary",
     bg: "bg-secondary/10",
-    title: "Integrated Audio",
-    body: "Talk through complex logic without leaving the editor. High-fidelity low-latency voice lanes.",
+    title: "Whiteboard for System Design",
+    body: "A shared Excalidraw-style canvas alongside the editor, so system-design rounds aren't stuck in code — sketch architecture, draw boxes and arrows, live with your interviewer.",
   },
 ];
 
 const navLinks = ["Home", "Documentation", "Features", "Community"];
-const footerLinks = ["Documentation", "GitHub", "Community", "Privacy"];
+
+const footerLinks = [
+  { label: "Documentation", href: "/docs" },
+  { label: "GitHub", href: "https://github.com/01tushar26/DevHive" },
+  { label: "Community", href: "/community" },
+  { label: "Privacy", href: "/privacy" },
+];
 
 const heroItem = {
   hidden: { opacity: 0, y: 18 },
@@ -137,21 +140,22 @@ export default function Home() {
             >
               <span className="flex h-2 w-2 rounded-full bg-primary-container animate-pulse" />
               <span className="text-xs font-label uppercase tracking-widest text-on-surface-variant">
-                V2.0 Now Live
+               Now with Live Video Interviews
               </span>
             </motion.div>
             <motion.h1
-              custom={1}
-              initial={initial}
-              animate="show"
-              variants={heroItem}
-              className="text-6xl md:text-8xl font-headline font-bold text-on-surface tracking-tighter mb-8 leading-[0.9]"
-            >
-              
-              Code in <span className="text-primary-container ">Harmony</span>,
-              <br />
-              Learn in <span className="text-primary-container ">Sync.</span>
-            </motion.h1>
+  custom={1}
+  initial={initial}
+  animate="show"
+  variants={heroItem}
+  className="text-6xl md:text-8xl font-headline font-bold text-on-surface tracking-tighter mb-8 leading-[0.9]"
+>
+  <span className="whitespace-nowrap">
+    Interview in <span className="text-primary-container ">Real-time</span>,
+  </span>
+  <br />
+  Code in <span className="text-primary-container ">Sync.</span>
+</motion.h1>
             <motion.p
               custom={2}
               initial={initial}
@@ -160,8 +164,8 @@ export default function Home() {
               className="text-xl md:text-2xl text-on-surface-variant font-body max-w-2xl mx-auto mb-12 leading-relaxed"
             >
               
-              DevHive is a live collaborative code editor designed for teams and students. Code
-              together in real-time, master DSA with friends, and build faster.
+             DevHive is a live collaborative code editor with built-in video calling — run mock interviews,
+            pair-program with your team, or grind DSA with friends, all face-to-face in one room.
             </motion.p>
             <motion.div
               custom={3}
@@ -213,11 +217,14 @@ export default function Home() {
             <div className="md:col-span-8 bg-surface-container-low rounded-xl p-8 relative overflow-hidden group border border-outline-variant/10">
               <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-primary-container/10 blur-[100px] group-hover:bg-primary-container/20 transition-all" />
               <Users className="text-primary-container mb-6" size={36} />
-              <h3 className="text-3xl font-headline font-bold mb-4">Live Multi-player Coding</h3>
-              <p className="text-on-surface-variant text-lg max-w-md leading-relaxed">
-                Write and debug together with sub-50ms latency. Our operational transformation
-                engine ensures conflict-free edits even on high-latency connections.
-              </p>
+
+              <h3 className="text-3xl font-headline font-bold mb-4">Face-to-Face Pair Coding</h3>
+<p className="text-on-surface-variant text-lg max-w-md leading-relaxed">
+  Debug together over video with sub-50ms code sync. Talk through the logic while you
+  both see the same lines change in real time — built for interviews, teaching, and
+  remote pairing alike.
+</p>
+
               <div className="mt-12 flex gap-4">
                 {collaborators.map((c) => (
                   <img
@@ -249,10 +256,11 @@ export default function Home() {
               <div className="flex-1">
                 <Network className="text-primary-fixed mb-6" size={36} />
                 <h3 className="text-3xl font-headline font-bold mb-4">Room Architecture</h3>
-                <p className="text-on-surface-variant leading-relaxed">
-                  Create private coding hives and share them with a simple link. Secure,
-                  persistent, and organized.
-                </p>
+<p className="text-on-surface-variant leading-relaxed">
+  Spin up a private room for an interview, a class, or a study group — share one link,
+  and everyone's in. Owner controls the session; participants can join or leave without
+  disrupting anyone else.
+</p>
               </div>
               <div className="w-full md:w-48 h-32 bg-surface-container rounded-lg border border-outline-variant/20 flex items-center justify-center">
                 <span className="text-primary-container font-mono text-sm">devhive.io/x8-k2p</span>
@@ -273,8 +281,8 @@ export default function Home() {
                 What's Buzzing Next
               </h3>
               <p className="text-on-surface-variant text-xl leading-relaxed mb-10">
-                We're constantly expanding the hive. Here's what our engineers are currently
-                shipping to production.
+                 From a 45-minute interview to a semester of DSA practice — here's what we're
+  shipping to make every kind of room better.
               </p>
               <div className="space-y-6">
                 {pipelineItems.map((item) => (
@@ -310,7 +318,7 @@ export default function Home() {
             Ready to enter the Hive?
           </h2>
           <p className="text-on-surface-variant text-xl max-w-2xl mx-auto mb-12">
-            Join developers coding in sync. 
+           Interviews, pair sessions, study groups — start a room and share the link.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button size="xl" onClick={()=>navigate("/editor")}>Get Started Free</Button>
@@ -329,20 +337,22 @@ export default function Home() {
               DevHive
             </span>
             <p className="text-neutral-500 text-sm font-body uppercase tracking-widest">
-              © 2026 DevHive. Built for the Neon Architect.
+             © 2026 DevHive. Built for developers who show up together.
             </p>
           </div>
-          <div className="flex gap-8">
-            {footerLinks.map((link) => (
-              <a
-                key={link}
-                href="#"
-                className="text-neutral-500 text-sm uppercase tracking-widest hover:text-[#00ffa3] transition-all duration-200"
-              >
-                {link}
-              </a>
-            ))}
-          </div>
+         <div className="flex gap-8">
+  {footerLinks.map(({ label, href }) => (
+    <a
+      key={label}
+      href={href}
+      target={href.startsWith("http") ? "_blank" : undefined}
+      rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+      className="text-neutral-500 text-sm uppercase tracking-widest hover:text-[#00ffa3] transition-all duration-200"
+    >
+      {label}
+    </a>
+  ))}
+</div>
         </div>
       </footer>
     </div>

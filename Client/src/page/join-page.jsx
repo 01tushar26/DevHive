@@ -18,7 +18,7 @@ const JoinPage = () => {
         if (response.status === 200) {
 
           toast.success("Joined room successfully")
-           setTimeout(() => navigate(`/room/${response.data.data.id}`), 1000)
+          setTimeout(() => navigate(`/room/${response.data.data.id}`), 1000)
           
         }
       } catch (err) {

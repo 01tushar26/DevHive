@@ -5,8 +5,8 @@ import { useState ,useRef,useEffect} from 'react';
 import CodeEditor from '@/components/CodeEditor';
 import { connectSocket,sendCodeUpdate,disconnectSocket, sendLanguageUpdate } from '@/Websockets/socket';
 import { toast  } from 'sonner';
-import axios from 'axios';
 import axiosInstance from '@/lib/axios-instance';
+import VideoCallPanel from '@/components/VideoCallPanel';
 
 
 const RoomPage = () => {
@@ -16,6 +16,11 @@ const RoomPage = () => {
     const [theme, setTheme] = useState("vs-dark");
     const [roomClosed, setRoomClosed] = useState(false)
     const navigate = useNavigate()
+    const [vcActive, setVcActive] = useState(false);
+    const [vcToken, setVcToken] = useState(null);
+    const [vcServerUrl, setVcServerUrl] = useState(null);
+    const [inCall, setInCall] = useState(false);
+    const justStartedVc = useRef(false);
 
 
     const {roomId } = useParams()
@@ -37,6 +42,7 @@ const RoomPage = () => {
           }
           setCode(res.data.data.code)
           setLanguage(res.data.data.language)
+          setVcActive(res.data.data.vcActive)
         }
       } catch (error) {
           const message = error.response?.data?.error?.message || "Failed to load room."
@@ -75,6 +81,15 @@ const RoomPage = () => {
       setLanguage(data.language);
       toast.success(` Room language successfully changed !!`);
     }
+    else if (data.message === "VC_STARTED") {
+       if (justStartedVc.current) {
+    justStartedVc.current = false;
+  } else {
+    setVcActive(true);
+    toast.success("Video call started join the video call !!");
+  }
+    
+  }
     else {
         
         console.warn("Unknown message type received:", data);
@@ -106,25 +121,75 @@ const RoomPage = () => {
     setLanguage(newLang);
     sendLanguageUpdate(roomId, newLang, username);
   };
-  
 
- return (
+  const handleStartVc = async () => {
+  try {
+    const res = await axiosInstance.post(`/livekit/start/${roomId}`);
+    setVcServerUrl(res.data.data.url);
+    setVcToken(res.data.data.token);
+     justStartedVc.current = true;
+    setVcActive(true);
+    setInCall(true);
+    toast.success("Successfully start the call !!" );
+  } catch (err) {
+    toast.error("Failed to start video call !!");
+  }
+};
+
+ const handleJoinCall = async () => {
+  try {
+    const res = await axiosInstance.post(`/livekit/token/${roomId}`);
+    setVcServerUrl(res.data.data.url);
+    setVcToken(res.data.data.token);
+    setInCall(true);
+    toast.success("Successfully joined video call !!");
+  } catch (err) {
+    toast.error("Failed to join video call");
+  }
+};
+
+const handleVcDisconnected = () => {
+  setVcToken(null);
+  setVcServerUrl(null);
+  setInCall(false);
+};
+  
+return (
     <div className="h-screen flex flex-col bg-background">
       <RoomEditorToolBar
-        language={language}
-        setLanguage={handlelanguageChange}
-        roomId = {roomId}
-        theme={theme}
-        setTheme={setTheme}
-      />
+  language={language}
+  setLanguage={handlelanguageChange}
+  roomId={roomId}
+  theme={theme}
+  setTheme={setTheme}
+  onStartVc={handleStartVc}
+  onJoinVc={handleJoinCall}
+  vcActive={vcActive}
+  inCall={inCall}
+/>
 
-      <CodeEditor
-        code={code}
-        setCode={handleCodeChange}
-        language={language}
-        theme={theme}
-      />
-    </div>)
+  <div className="flex flex-1 overflow-hidden">
+  <div className="flex-1 min-w-0">
+    <CodeEditor
+      code={code}
+      setCode={handleCodeChange}
+      language={language}
+      theme={theme}
+    />
+  </div>
+
+  {inCall && (
+  <div className="w-80 shrink-0 border-l border-outline-variant/10 relative overflow-hidden">
+    <VideoCallPanel
+      serverUrl={vcServerUrl}
+      token={vcToken}
+      onDisconnected={handleVcDisconnected}
+    />
+  </div>
+)}
+</div>
+</div>
+)
 }
 
 export default RoomPage
