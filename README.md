@@ -1,39 +1,75 @@
-# Dev Hive — Live Collaborative Code Editor
+# Dev Hive - Interview in real-time, code in sync
 
-A real-time collaborative code editor where multiple users join a shared room and write code together, with changes synced instantly across all clients.
+---
+DevHive is a live collaborative code editor with built-in video calling. Run mock interviews, pair-program with your team, or grind DSA with friends — all face-to-face in one room.
+
+**Live Demo:** 
+
+<p align="center">
+  <img src="assets/home.png" alt="Learnify Architecture" width="1772"/>
+</p>
+
+<p align="center">
+  <img src="assets/editor.png" alt="Learnify Architecture" width="1772"/>
+</p>
 
 ---
 
+## Features
+
+---
+
+
+- **Real-Time Code Collaboration** — Monaco Editor synced live across all room participants via WebSocket
+- **Video & Audio Calling** — LiveKit-powered WebRTC integration directly inside coding rooms
+- **WebSocket Messaging** — STOMP over SockJS for bi-directional client-server communication
+- **Redis Write-Through Cache** — live code/language updates hit Redis first, avoiding DB writes on every keystroke
+- **Scheduled DB Sync** — background cron job (every 30s) persists cached Redis code back to the database
+- **Redis Pub/Sub Broadcasting** — decouples publisher/subscriber for horizontally scalable, multi-instance WebSocket delivery
+- **Collision-Safe Room IDs** — auto-generated unique room IDs with retry logic on conflict
+- **Concurrency-Safe Joins** — pessimistic locking prevents race conditions when multiple users join simultaneously
+- **Reconnect Handling** — rejoining users get re-synced state (`USER_REJOIN`) instead of duplicate participant entries
+- **Live Room Events** — real-time broadcasts for user joined, left, rejoined, and room closed
+- **JWT Authentication** — short-lived access tokens + long-lived refresh tokens (6 months) in HTTP-only cookies
+- **Role-Based LiveKit Tokens** — per-user JWT tokens with admin grants for room owners
+- **Automatic Call Lifecycle Management** — LiveKit room auto-created on call start, cleaned up on room end, participants auto-removed on leave
+- **Cache-Aside Fallback** — graceful handling and logging of Redis cache misses with DB fallback
+- **Global Exception Handling** — custom exceptions (`ResourceNotFoundException`, `RoomNotAvailableException`, `AccessDeniedException`) for consistent error responses
+- **Modular Service Architecture** — clean separation across Room, User, LiveKit, and Redis services
+
+
+---
+
+
 ## Tech Stack
 
+---
+
 | Layer | Technology |
-|-------|------------|
+|---|---|
 | Frontend | React, Vite, TailwindCSS |
 | Code Editor | Monaco Editor (`@monaco-editor/react`) |
 | WebSocket Client | SockJS + STOMP.js (`@stomp/stompjs`) |
+| Video Calling | WebRTC (SFU topology) via LiveKit |
 | Backend | Spring Boot |
 | Real-time | WebSocket + STOMP |
 | Cache / Pub-Sub | Redis |
 | Database | PostgreSQL (Spring Data JPA) |
 | Auth | JWT + Refresh Token (HttpOnly Cookie) |
+ 
+---
 
-## WebSocket Architecture
-
-<p align="center">
-  <img src="assets/image.png" alt="Devhive Websockets Architecture" width="1006"/>
-</p>
+## Architecture
 
 ---
 
-## How It Works
-
-Each keystroke is sent over STOMP to `CodeSyncController`, which writes the latest code to Redis and publishes it to a Redis Pub/Sub channel. `RedisMessageSubscriber` picks it up and broadcasts to `/topic/room/{roomId}`, reaching all connected clients in real time.
-
-`RoomSyncScheduler` flushes Redis → PostgreSQL every 30 seconds for durability. On `endRoom`, a final sync runs before the Redis key is deleted.
-
 ---
+
+
 
 ## API Reference
+
+---
 
 ### Auth — `/auth`
 
@@ -43,6 +79,10 @@ Each keystroke is sent over STOMP to `CodeSyncController`, which writes the late
 | `POST` | `/auth/login` | Login; sets HttpOnly refresh token cookie |
 | `POST` | `/auth/refresh` | Rotate access + refresh token |
 | `POST` | `/auth/logout` | Revoke token + clear cookie |
+
+
+---
+
 
 ### Rooms — `/rooms`
 
@@ -54,48 +94,26 @@ Each keystroke is sent over STOMP to `CodeSyncController`, which writes the late
 | `DELETE` | `/rooms/{roomId}/end` | Owner ends room; final Redis → DB sync |
 | `DELETE` | `/rooms/{roomId}/leave` | Participant leaves room |
 
-### WebSocket — `ws://<host>/ws`
+---
 
-| Direction | Destination | Description |
-|-----------|-------------|-------------|
-| Client → Server | `/app/code-update/{roomId}` | Send a code change |
-| Server → Client | `/topic/room/{roomId}` | Receive updates, join/leave events, room-end signal |
+### WebSocket 
+
+| Direction | Destination | Description                                                            |
+|-----------|-------------|------------------------------------------------------------------------|
+| Client → Server | `/app/code-update/{roomId}` | Send a code change                                                     |
+| Server → Client | `/topic/room/{roomId}` | Receive updates, join/leave events, video call events, room-end signal |
+
+
+---
+
+
+### Livekit
+
 
 ---
 
 ## Running Locally
 
-**Prerequisites:** Java 21+, Maven, PostgreSQL, Redis
 
-```yaml
-# application.yml
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/devhive
-    username: postgres
-    password: yourpassword
-  redis:
-    host: localhost
-    port: 6379
-app:
-  redis:
-    channel: room:code-updates
-```
-
-```bash
-redis-server
-./mvnw spring-boot:run
-
-# Frontend
-npm install && npm run dev
-```
 
 ---
-
-## Design Notes
-
-**Redis-first writes** — PostgreSQL can't absorb per-keystroke writes at scale. Redis buffers all updates in memory; the scheduler persists them at a safe cadence.
-
-**Pub/Sub over direct broadcast** — In a multi-instance deployment, clients connect to different server nodes. Publishing through Redis ensures every node's subscriber relays the update to its own clients.
-
-**Pessimistic locking on join** — Prevents two concurrent requests from both reading a non-full room and pushing it past capacity. The lock is short-lived and join frequency is low, so contention is negligible.
