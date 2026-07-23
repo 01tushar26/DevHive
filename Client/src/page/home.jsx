@@ -8,6 +8,10 @@ import {
   Mic,
   MousePointer2,
   Pen,
+  X,
+  Github,
+  Linkedin,
+  Twitter,
 } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import editor from "@/assets/editor.png";
@@ -71,13 +75,12 @@ const pipelineItems = [
   },
 ];
 
-const navLinks = ["Home", "Documentation", "Features", "Community"];
+// const navLinks = ["Home", "Documentation", "Features", "Community"];
 
 const footerLinks = [
-  { label: "Documentation", href: "/docs" },
-  { label: "GitHub", href: "https://github.com/01tushar26/DevHive" },
-  { label: "Community", href: "/community" },
-  { label: "Privacy", href: "/privacy" },
+  { icon: Twitter, href: "https://x.com/tushartyagi2601", label: "X" },
+  { icon: Github, href: "https://github.com/01tushar26/DevHive", label: "GitHub" },
+  { icon: Linkedin, href: "https://www.linkedin.com/in/tushartyagi2601/", label: "LinkedIn" },
 ];
 
 const heroItem = {
@@ -105,20 +108,7 @@ export default function Home() {
               DevHive
             </span>
           </div>
-          <nav className="hidden md:flex gap-8 items-center">
-            {navLinks.map((link, i) => (
-              <a
-                key={link}
-                href="#"
-                className={cn(
-                  "font-headline tracking-tight transition-colors duration-300 hover:text-[#00ffa3]",
-                  i === 0 ? "text-[#00ffa3] font-bold" : "text-neutral-400"
-                )}
-              >
-                {link}
-              </a>
-            ))}
-          </nav>
+         
           <Button variant="default" size="sm" onClick={()=>navigate("/signup")}>
             Sign Up
           </Button>
@@ -330,31 +320,42 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-neutral-950 w-full py-12 border-t border-neutral-800/20">
-        <div className="flex flex-col md:flex-row justify-between items-center px-8 gap-6 max-w-7xl mx-auto">
-          <div className="flex flex-col items-center md:items-start gap-2">
-            <span className="text-lg font-black text-neutral-100 font-headline uppercase tracking-widest">
-              DevHive
-            </span>
-            <p className="text-neutral-500 text-sm font-body uppercase tracking-widest">
-             © 2026 DevHive. Built for developers who show up together.
-            </p>
-          </div>
-         <div className="flex gap-8">
-  {footerLinks.map(({ label, href }) => (
-    <a
-      key={label}
-      href={href}
-      target={href.startsWith("http") ? "_blank" : undefined}
-      rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-      className="text-neutral-500 text-sm uppercase tracking-widest hover:text-[#00ffa3] transition-all duration-200"
-    >
-      {label}
-    </a>
-  ))}
-</div>
-        </div>
-      </footer>
+<footer className="bg-neutral-950 w-full py-12 border-t border-neutral-800/20">
+  <div className="flex flex-col md:flex-row justify-between items-center md:items-center gap-10 px-8 max-w-7xl mx-auto">
+    
+    {/* Brand */}
+    <div className="flex flex-col items-center md:items-start gap-2 text-center md:text-left">
+      <span className="text-lg font-black text-neutral-100 font-headline uppercase tracking-widest">
+        DevHive
+      </span>
+      <p className="text-neutral-500 text-sm font-body uppercase tracking-widest">
+        © 2026 DevHive. Built for developers who show up together.
+      </p>
+    </div>
+
+    {/* Connect */}
+    <div className="flex flex-col items-center md:items-end gap-2 text-center md:text-right">
+      <span className="text-lg font-black text-neutral-100 font-headline uppercase tracking-widest">
+        Connect
+      </span>
+      <div className="flex gap-6">
+        {footerLinks.map(({ icon: Icon, href, label }) => (
+          <a
+            key={label}
+            href={href}
+            target={href.startsWith("http") ? "_blank" : undefined}
+            rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+            aria-label={label}
+            className="text-neutral-500 hover:text-[#00ffa3] transition-all duration-200"
+          >
+            <Icon size={20} />
+          </a>
+        ))}
+      </div>
+    </div>
+
+  </div>
+</footer>
     </div>
   );
 }
