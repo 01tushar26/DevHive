@@ -70,7 +70,9 @@ public class RoomServiceImpl implements RoomService{
 
                 //put it into redis
                 seedRedis(newRoom.getId(),newRoom.getCode());
-                return mapper.map(newRoom,RoomResponseDto.class);
+                RoomResponseDto roomResponseDto = mapper.map(newRoom,RoomResponseDto.class);
+                roomResponseDto.setViewerOwner(true);
+                return roomResponseDto;
             } catch (DataIntegrityViolationException e) {
                 log.warn("Room ID collision on attempt {}, retrying...", attempt + 1);
                 if (attempt == MAX_RETRY_ATTEMPTS - 1) {
@@ -105,8 +107,10 @@ public class RoomServiceImpl implements RoomService{
 
         if(participant != null){
             ensureRedisSeeded(roomID,room.getCode());
+           RoomResponseDto roomResponseDto = mapper.map(room,RoomResponseDto.class);
+           roomResponseDto.setViewerOwner(currentUser.getId().equals(room.getOwner().getId()));
             RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_REJOIN");
-            return new LeaveJoinRoomResponseDto(mapper.map(room,RoomResponseDto.class),eventDto);
+            return new LeaveJoinRoomResponseDto(roomResponseDto,eventDto);
         }
 
 
@@ -139,12 +143,16 @@ public class RoomServiceImpl implements RoomService{
         room = roomRepository.save(room);
 
         ensureRedisSeeded(roomID,room.getCode());
+        RoomResponseDto roomResponseDto = mapper.map(room,RoomResponseDto.class);
+        roomResponseDto.setViewerOwner(currentUser.getId().equals(room.getOwner().getId()));
+
         RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_JOIN");
-        return new LeaveJoinRoomResponseDto(mapper.map(room,RoomResponseDto.class),eventDto);
+        return new LeaveJoinRoomResponseDto(roomResponseDto,eventDto);
     }
 
     @Override
     public RoomResponseDto getRoom(String roomId) {
+        User currentUser = getAuthenticatedUser();
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
 
@@ -153,8 +161,9 @@ public class RoomServiceImpl implements RoomService{
         if (liveCode != null) {
             room.setCode(liveCode);  // override stale DB code with live Redis value
         }
-
-        return mapper.map(room, RoomResponseDto.class);
+        RoomResponseDto roomResponseDto = mapper.map(room,RoomResponseDto.class);
+        roomResponseDto.setViewerOwner(currentUser.getId().equals(room.getOwner().getId()));
+        return roomResponseDto;
     }
 
 
@@ -181,6 +190,7 @@ public class RoomServiceImpl implements RoomService{
 
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new RoomNotAvailableException("Room not found"));
+
         if(room.getStatus() == RoomsStatus.CLOSED){
             throw new RuntimeException("Room is already closed");
         }
@@ -213,10 +223,12 @@ public class RoomServiceImpl implements RoomService{
 
         redisTemplate.delete(ROOM_CODE_KEY + roomId);
         log.info("Redis key deleted for closed room: {}", roomId);
-        //this will delete the livekit vc rooom if exist
+        //this will delete the livekit vc rooom if exist if not did not give the just give warning in log
         liveKitService.closeVideoCall(roomId);
+        RoomResponseDto roomResponseDto = mapper.map(room,RoomResponseDto.class);
+        roomResponseDto.setViewerOwner(currentUser.getId().equals(room.getOwner().getId()));
 
-        return mapper.map(room,RoomResponseDto.class);
+        return roomResponseDto;
     }
 
     @Override
@@ -251,9 +263,10 @@ public class RoomServiceImpl implements RoomService{
 
         room = roomRepository.save(room);
         liveKitService.removeParticipant(roomId, currentUser.getEmail());
-
+        RoomResponseDto roomResponseDto = mapper.map(room,RoomResponseDto.class);
+        roomResponseDto.setViewerOwner(currentUser.getId().equals(room.getOwner().getId()));
         RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_LEFT");
-        return new LeaveJoinRoomResponseDto(mapper.map(room,RoomResponseDto.class),eventDto);
+        return new LeaveJoinRoomResponseDto(roomResponseDto,eventDto);
 
     }
 

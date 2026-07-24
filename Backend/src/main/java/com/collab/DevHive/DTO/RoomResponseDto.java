@@ -23,6 +23,7 @@ public class RoomResponseDto {
     private String language;
     private boolean vcActive;
     private UserDTO owner;
+    private boolean ViewerOwner;
 //    private String ownerUsername;
     private RoomsStatus status;
     private List<ParticipantResponseDto> participants;
