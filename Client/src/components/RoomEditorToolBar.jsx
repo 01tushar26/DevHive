@@ -9,9 +9,12 @@ import { Input } from './ui/input'
 import axiosInstance from '@/lib/axios-instance'
 import { toast } from 'sonner'
 import ShinyText from './ui/shinyText'
+import { useNavigate } from 'react-router-dom'
 
 
-const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onStartVc, vcActive,inCall ,onJoinVc}) => {
+const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onStartVc, vcActive,inCall ,onJoinVc,isOwner}) => {
+
+   const navigate = useNavigate()
 
   async function deleteRoom() {
     try {
@@ -22,11 +25,24 @@ const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onS
         error.response?.data?.error?.message ||
         error.response?.data?.data?.message ||
         "Failed to delete room"
-      toast.success(message);
+      toast.error(message);
+    }
+  }
+  async function leaveRoom() {
+    try {
+      await axiosInstance.delete(`/rooms/${roomId}/leave`);
+      toast.success("You left the room")
+       navigate("/editor")
+
+    } catch (error) {
+      const message =
+        error.response?.data?.error?.message ||
+        error.response?.data?.data?.message ||
+        "Failed to leave room"
+      toast.error(message);
     }
   }
 
-  const inputRef = useRef()
   const link = `http://localhost:5173/room/${roomId}/join`;
 
   function copyCode() {
@@ -139,7 +155,7 @@ const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onS
           </DialogContent>
         </Dialog>
 
-        <Button
+        {isOwner?<Button
           onClick={() => deleteRoom()}
           variant="destructive"
           className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 transition-colors gap-2"
@@ -147,6 +163,14 @@ const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onS
           <LogOut className="w-4 h-4" />
           End Session
         </Button>
+        :<Button
+          onClick={() => leaveRoom()}
+          variant="destructive"
+          className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 transition-colors gap-2"
+        >
+          <LogOut className="w-4 h-4" />
+          Leave Session
+        </Button>}
       </div>
     </div>
   )

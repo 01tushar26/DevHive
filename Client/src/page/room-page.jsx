@@ -11,6 +11,7 @@ import VideoCallPanel from '@/components/VideoCallPanel';
 
 const RoomPage = () => {
 
+    const [isOwner, setIsOwner] = useState(false);
     const [code, setCode] = useState("// Start coding...");
     const [language, setLanguage] = useState("javascript");
     const [theme, setTheme] = useState("vs-dark");
@@ -43,6 +44,7 @@ const RoomPage = () => {
           setCode(res.data.data.code)
           setLanguage(res.data.data.language)
           setVcActive(res.data.data.vcActive)
+          setIsOwner(res.data.data.ViewerOwner)
         }
       } catch (error) {
           const message = error.response?.data?.error?.message || "Failed to load room."
@@ -124,13 +126,14 @@ const RoomPage = () => {
 
   const handleStartVc = async () => {
   try {
+     toast.success("Starting the call ..." );
     const res = await axiosInstance.post(`/livekit/start/${roomId}`);
     setVcServerUrl(res.data.data.url);
     setVcToken(res.data.data.token);
      justStartedVc.current = true;
     setVcActive(true);
     setInCall(true);
-    toast.success("Successfully start the call !!" );
+    // toast.success("Successfully start the call !!" );
   } catch (err) {
     toast.error("Failed to start video call !!");
   }
@@ -138,6 +141,7 @@ const RoomPage = () => {
 
  const handleJoinCall = async () => {
   try {
+    
     const res = await axiosInstance.post(`/livekit/token/${roomId}`);
     setVcServerUrl(res.data.data.url);
     setVcToken(res.data.data.token);
@@ -166,6 +170,7 @@ return (
   onJoinVc={handleJoinCall}
   vcActive={vcActive}
   inCall={inCall}
+  isOwner={isOwner}
 />
 
   <div className="flex flex-1 overflow-hidden">
