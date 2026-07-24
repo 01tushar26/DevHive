@@ -1,23 +1,21 @@
 # Dev Hive - Interview in real-time, code in sync
 
----
 DevHive is a live collaborative code editor with built-in video calling. Run mock interviews, pair-program with your team, or grind DSA with friends — all face-to-face in one room.
 
 **Live Demo:** 
 
 <p align="center">
-  <img src="assets/home.png" alt="Learnify Architecture" width="1772"/>
+  <img src="assets/home.png" alt="Learnify Architecture" width="1344"/>
 </p>
 
 <p align="center">
-  <img src="assets/editor.png" alt="Learnify Architecture" width="1772"/>
+  <img src="assets/editor.png" alt="Learnify Architecture" width="1672"/>
 </p>
 
 ---
 
 ## Features
 
----
 
 
 - **Real-Time Code Collaboration** — Monaco Editor synced live across all room participants via WebSocket
@@ -43,7 +41,6 @@ DevHive is a live collaborative code editor with built-in video calling. Run moc
 
 ## Tech Stack
 
----
 
 | Layer | Technology |
 |---|---|
@@ -61,15 +58,12 @@ DevHive is a live collaborative code editor with built-in video calling. Run moc
 
 ## Architecture
 
----
 
 ---
 
 
 
 ## API Reference
-
----
 
 ### Auth — `/auth`
 
@@ -80,9 +74,7 @@ DevHive is a live collaborative code editor with built-in video calling. Run moc
 | `POST` | `/auth/refresh` | Rotate access + refresh token |
 | `POST` | `/auth/logout` | Revoke token + clear cookie |
 
-
 ---
-
 
 ### Rooms — `/rooms`
 
@@ -96,19 +88,22 @@ DevHive is a live collaborative code editor with built-in video calling. Run moc
 
 ---
 
-### WebSocket 
+### WebSocket
 
-| Direction | Destination | Description                                                            |
-|-----------|-------------|------------------------------------------------------------------------|
-| Client → Server | `/app/code-update/{roomId}` | Send a code change                                                     |
-| Server → Client | `/topic/room/{roomId}` | Receive updates, join/leave events, video call events, room-end signal |
-
+| Direction | Destination | Description |
+|-----------|-------------|--------------|
+| Client → Server | `/app/code-update/{roomId}` | Send a code change; cached in Redis (`ROOM_CODE_KEY`, TTL via `ROOM_TTL_HOURS`) and republished |
+| Client → Server | `/app/lang-update/{roomId}` | Change the room's active language; persisted via `RoomService.langUpdate` and republished |
+| Server → Client | `/topic/room/{roomId}` | Receive code updates, language updates, join/leave events, video call events, room-end signal |
 
 ---
 
+### LiveKit — `/livekit`
 
-### Livekit
-
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/livekit/token/{roomId}` | Validates membership and returns a LiveKit access token for the caller to join the room's video call |
+| `POST` | `/livekit/start/{roomId}` | Validates membership, creates the LiveKit room, returns the initiator's token, and broadcasts a `VC_STARTED` event to `/topic/room/{roomId}` |
 
 ---
 
