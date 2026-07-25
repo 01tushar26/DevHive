@@ -109,7 +109,7 @@ public class RoomServiceImpl implements RoomService{
             ensureRedisSeeded(roomID,room.getCode());
            RoomResponseDto roomResponseDto = mapper.map(room,RoomResponseDto.class);
            roomResponseDto.setViewerOwner(currentUser.getId().equals(room.getOwner().getId()));
-            RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_REJOIN");
+            RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),roomID,"USER_REJOIN");
             return new LeaveJoinRoomResponseDto(roomResponseDto,eventDto);
         }
 
@@ -146,7 +146,7 @@ public class RoomServiceImpl implements RoomService{
         RoomResponseDto roomResponseDto = mapper.map(room,RoomResponseDto.class);
         roomResponseDto.setViewerOwner(currentUser.getId().equals(room.getOwner().getId()));
 
-        RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_JOIN");
+        RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),roomID,"USER_JOIN");
         return new LeaveJoinRoomResponseDto(roomResponseDto,eventDto);
     }
 
@@ -265,7 +265,7 @@ public class RoomServiceImpl implements RoomService{
         liveKitService.removeParticipant(roomId, currentUser.getEmail());
         RoomResponseDto roomResponseDto = mapper.map(room,RoomResponseDto.class);
         roomResponseDto.setViewerOwner(currentUser.getId().equals(room.getOwner().getId()));
-        RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),currentUser.getId(),"USER_LEFT");
+        RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),roomId,"USER_LEFT");
         return new LeaveJoinRoomResponseDto(roomResponseDto,eventDto);
 
     }

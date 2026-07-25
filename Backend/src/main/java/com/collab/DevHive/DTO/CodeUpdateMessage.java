@@ -6,6 +6,5 @@ import lombok.Data;
 public class CodeUpdateMessage {
     private String roomId;
     private String code;
-    private String username;
     private final String message = "CODE_UPDATE";
 }

@@ -1,7 +1,6 @@
 package com.collab.DevHive.Service.RedisService;
 
-import com.collab.DevHive.DTO.CodeUpdateMessage;
-import com.collab.DevHive.DTO.LanguageUpdateMessage;
+import com.collab.DevHive.DTO.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -20,7 +19,7 @@ public class RedisMessageSubscriber implements MessageListener {
     private final SimpMessagingTemplate messagingTemplate;
     private final ObjectMapper objectMapper;
 
-
+    //Todo- esuner every wbe
     //this will automatically run when there is event in redis pubsub
     @Override
     public void onMessage(Message message, byte @Nullable [] pattern) {
@@ -35,7 +34,7 @@ public class RedisMessageSubscriber implements MessageListener {
                         "/topic/room/" + langUpdate.getRoomId(),
                         langUpdate
                 );
-                log.debug("Broadcast LANG_UPDATE from Redis → /topic/room/{}", langUpdate.getRoomId());
+                log.info("Broadcast LANG_UPDATE from Redis → /topic/room/{}", langUpdate.getRoomId());
 
             } else if ("CODE_UPDATE".equals(type)) {
                 CodeUpdateMessage codeUpdate = objectMapper.readValue(json, CodeUpdateMessage.class);
@@ -43,7 +42,34 @@ public class RedisMessageSubscriber implements MessageListener {
                         "/topic/room/" + codeUpdate.getRoomId(),
                         codeUpdate
                 );
-                log.debug("Broadcast CODE_UPDATE from Redis → /topic/room/{}", codeUpdate.getRoomId());
+                log.info("Broadcast CODE_UPDATE from Redis → /topic/room/{}", codeUpdate.getRoomId());
+
+            } else if ("VC_STARTED".equals(type)) {
+                VideoCallMessage eventDTO = objectMapper.readValue(json, VideoCallMessage.class);
+
+                messagingTemplate.convertAndSend(
+                        "/topic/room/" + eventDTO.getRoomId(),
+                        eventDTO
+                );
+                log.info("Broadcast VC Started from Redis → /topic/room/{}", eventDTO.getRoomId());
+
+            } else if ("USER_JOIN".equals(type) || "USER_REJOIN".equals(type) || "USER_LEFT".equals(type) ) {
+                RoomEventDto eventDTO = objectMapper.readValue(json, RoomEventDto.class);
+
+                messagingTemplate.convertAndSend(
+                        "/topic/room/" + eventDTO.getRoomId(),
+                        eventDTO
+                );
+                log.info("Broadcast User JOIN/REJOIN/LEFT from redis → /topic/room/{}", eventDTO.getRoomId());
+
+            } else if ("ROOM_ENDED".equals(type) ) {
+                RoomEndMessage eventDTO = objectMapper.readValue(json,RoomEndMessage.class);
+
+                messagingTemplate.convertAndSend(
+                        "/topic/room/" + eventDTO.getRoomId(),
+                        eventDTO
+                );
+                log.info("Broadcast Room ENDED from redis → /topic/room/{}", eventDTO.getRoomId());
 
             } else {
                 log.warn("Unknown message type on Redis channel: {}", type);

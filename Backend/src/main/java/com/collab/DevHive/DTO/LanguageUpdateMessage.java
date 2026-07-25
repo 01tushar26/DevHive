@@ -7,7 +7,6 @@ public class LanguageUpdateMessage {
 
     private String roomId;
     private String language;
-    private String username;
     private final String message = "LANG_UPDATE";
 
 }

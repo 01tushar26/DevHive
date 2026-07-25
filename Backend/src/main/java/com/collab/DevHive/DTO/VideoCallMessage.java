@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VideoCallEventDTO {
+public class VideoCallMessage {
     private String roomId;
-    private String message;
+    private final String message ="VC_STARTED";
 }

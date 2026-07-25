@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoomEventDto {
-
-    private String userName;
+public class RoomEndMessage {
     private String roomId;
-    private String message;
+    private final String message = "ROOM_ENDED";
 }
