@@ -62,7 +62,15 @@ const RoomPage = () => {
       if (roomClosed) return
 
     connectSocket(roomId, (data) => {
-       if (data.message === "USER_LEFT") {
+
+        if (data.message === "ROOM_ENDED") {
+          // endRoom — disconnect all and redirect
+          disconnectSocket();
+          
+          toast.error("The room has been closed by the host")
+          navigate("/editor")
+        } 
+       else if (data.message === "USER_LEFT") {
         
         toast.error(`${data.userName} left the room !!`);  
     } else if (data.message === "USER_JOIN") {
@@ -111,7 +119,7 @@ const RoomPage = () => {
     }
 
     setCode(newCode);
-    sendCodeUpdate(roomId, newCode, username);
+    sendCodeUpdate(roomId, newCode);
   };
 
   const handlelanguageChange = (newLang) => {
@@ -121,7 +129,7 @@ const RoomPage = () => {
     }
 
     setLanguage(newLang);
-    sendLanguageUpdate(roomId, newLang, username);
+    sendLanguageUpdate(roomId, newLang);
   };
 
   const handleStartVc = async () => {

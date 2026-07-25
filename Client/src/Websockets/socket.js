@@ -20,14 +20,7 @@ export const connectSocket = (roomId, onMessageReceived) => {
 
         const data = JSON.parse(message.body);
 
-        if (data.status === "CLOSED") {
-          // endRoom — disconnect all and redirect
-          disconnectSocket();
-          
-          toast.error("The room has been closed by the host")
-
-          window.location.href = 'http://localhost:5173/editor';
-        } 
+      
           onMessageReceived(data);
       });
     },
@@ -40,23 +33,22 @@ export const connectSocket = (roomId, onMessageReceived) => {
   stompClient.activate();
 };
 
-export const sendCodeUpdate = (roomId, code, username = "anonymous") => {
+export const sendCodeUpdate = (roomId, code) => {
   if (stompClient && stompClient.connected) {
     stompClient.publish({
       destination: `/app/code-update/${roomId}`,
       body: JSON.stringify({
         roomId,
         code,
-        username,
       }),
     });
   }
 };
-export const sendLanguageUpdate = (roomId, language, username = "anonymous") => {
+export const sendLanguageUpdate = (roomId, language) => {
   if (stompClient && stompClient.connected) {
     stompClient.publish({
       destination: `/app/lang-update/${roomId}`,   
-      body: JSON.stringify({ roomId, language, username }),
+      body: JSON.stringify({ roomId, language }),
     });
   }
 };
