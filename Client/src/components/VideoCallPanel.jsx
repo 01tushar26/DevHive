@@ -1,4 +1,4 @@
-import { LiveKitRoom, GridLayout, ParticipantTile, useTracks, ControlBar } from '@livekit/components-react';
+import { LiveKitRoom, GridLayout, ParticipantTile, useTracks, ControlBar, RoomAudioRenderer } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import '@livekit/components-styles';
 
@@ -66,6 +66,7 @@ const VideoCallPanel = ({ serverUrl, token, onDisconnected }) => {
         <div style={{ flex: 1, overflow: 'hidden' ,position: 'relative'}}>
           <VideoGrid />
         </div>
+          <RoomAudioRenderer />   
         <ControlBar
           controls={{
             microphone: true,
