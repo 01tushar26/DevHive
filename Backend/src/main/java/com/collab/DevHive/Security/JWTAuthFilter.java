@@ -2,6 +2,7 @@ package com.collab.DevHive.Security;
 
 
 import com.collab.DevHive.Entities.User;
+import com.collab.DevHive.Exceptions.ResourceNotFoundException;
 import com.collab.DevHive.Service.UserService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -69,6 +71,15 @@ public class JWTAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (JwtException ex) {
             handlerExceptionResolver.resolveException(request, response, null, ex);
+        }
+        catch (ResourceNotFoundException ex) {
+            // Token is structurally valid but the user it points to is gone (DB reset, deleted account, etc).
+            // Treat this the same as an invalid token, not a 404 resource-not-found.
+            handlerExceptionResolver.resolveException(
+                    request, response, null,
+                    new AuthenticationServiceException("Invalid or expired session")
+
+            );
         }
     }
 }
