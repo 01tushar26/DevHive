@@ -3,7 +3,9 @@ import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState ,useRef,useEffect} from 'react';
 import CodeEditor from '@/components/CodeEditor';
-import { connectSocket,sendCodeUpdate,disconnectSocket, sendLanguageUpdate } from '@/Websockets/socket';
+import Whiteboard from '@/components/Whiteboard';
+import { connectSocket, sendCodeUpdate, disconnectSocket, sendLanguageUpdate, sendWhiteboardUpdate } from '@/Websockets/socket';
+
 import { toast  } from 'sonner';
 import axiosInstance from '@/lib/axios-instance';
 import VideoCallPanel from '@/components/VideoCallPanel';
@@ -22,6 +24,11 @@ const RoomPage = () => {
     const [vcServerUrl, setVcServerUrl] = useState(null);
     const [inCall, setInCall] = useState(false);
     const justStartedVc = useRef(false);
+    const [viewMode, setViewMode] = useState("code"); // "code" | "whiteboard"
+const [whiteboardElements, setWhiteboardElements] = useState([]);
+const excalidrawAPIRef = useRef(null);
+const isRemoteWhiteboardUpdate = useRef(false);
+const wbDebounceRef = useRef(null);
 
 
     const {roomId } = useParams()
@@ -45,6 +52,11 @@ const RoomPage = () => {
           setLanguage(res.data.data.language)
           setVcActive(res.data.data.vcActive)
           setIsOwner(res.data.data.ViewerOwner)
+          setWhiteboardElements(
+           res.data.data.whiteboardElements
+           ? JSON.parse(res.data.data.whiteboardElements)
+           : []
+          )
         }
       } catch (error) {
           const message = error.response?.data?.error?.message || "Failed to load room."
@@ -85,6 +97,10 @@ const RoomPage = () => {
         isRemoteUpdate.current = true;  // 
         setCode(data.code);
     }
+    else if (data.message === "WB_UPDATE") {
+  isRemoteWhiteboardUpdate.current = true;
+  setWhiteboardElements(JSON.parse(data.elements));
+}
     else if(data.message =="LANG_UPDATE"){
       
       isRemoteLanguageUpdate.current=true;
@@ -121,6 +137,14 @@ const RoomPage = () => {
     setCode(newCode);
     sendCodeUpdate(roomId, newCode);
   };
+
+  const handleWhiteboardChange = (newElements) => {
+  setWhiteboardElements(newElements);
+  clearTimeout(wbDebounceRef.current);
+  wbDebounceRef.current = setTimeout(() => {
+    sendWhiteboardUpdate(roomId, newElements);
+  }, 300);
+};
 
   const handlelanguageChange = (newLang) => {
     if (isRemoteLanguageUpdate.current) {
@@ -179,17 +203,22 @@ return (
   vcActive={vcActive}
   inCall={inCall}
   isOwner={isOwner}
+  viewMode={viewMode}
+  setViewMode={setViewMode}
 />
 
   <div className="flex flex-1 overflow-hidden">
   <div className="flex-1 min-w-0">
-    <CodeEditor
-      code={code}
-      setCode={handleCodeChange}
-      language={language}
-      theme={theme}
+  {viewMode === "code" ? (
+    <CodeEditor code={code} setCode={handleCodeChange} language={language} theme={theme} />
+  ) : (
+    <Whiteboard
+      elements={whiteboardElements}
+      onLocalChange={handleWhiteboardChange}
+      excalidrawAPIRef={excalidrawAPIRef}
     />
-  </div>
+  )}
+</div>
 
   {inCall && (
   <div className="w-80 shrink-0 border-l border-outline-variant/10 relative overflow-hidden">

@@ -52,6 +52,17 @@ export const sendLanguageUpdate = (roomId, language) => {
     });
   }
 };
+export const sendWhiteboardUpdate = (roomId, elements) => {
+  if (stompClient && stompClient.connected) {
+    stompClient.publish({
+      destination: `/app/whiteboard-update/${roomId}`,
+      body: JSON.stringify({
+        roomId,
+        elements: JSON.stringify(elements), // backend expects elements as a String
+      }),
+    });
+  }
+};
 //when you delete the room this function disconnect the websocket persistence connection
 export const disconnectSocket = () => {
   if (stompClient) {

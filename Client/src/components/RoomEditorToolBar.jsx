@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import LanguageSelector from './LanguageSelector'
 import ThemeSelector from './ThemeSelector'
-import { Code2, Copy, Link2, LogOut, Users, Video } from 'lucide-react'
+import { Code2, Copy, Link2, LogOut, Users, Video, PenLine } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
 import { Button } from './ui/button'
 import { Field, FieldLabel } from './ui/field'
@@ -12,7 +12,7 @@ import ShinyText from './ui/shinyText'
 import { useNavigate } from 'react-router-dom'
 
 
-const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onStartVc, vcActive,inCall ,onJoinVc,isOwner}) => {
+const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onStartVc, vcActive, inCall, onJoinVc, isOwner, viewMode, setViewMode }) => {
 
    const navigate = useNavigate()
 
@@ -80,11 +80,41 @@ const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onS
       </div>
 
       <div className="flex items-center gap-4">
-        <LanguageSelector language={language} setLanguage={setLanguage} />
-        <ThemeSelector theme={theme} setTheme={setTheme} />
+    
+        <div className="flex items-center bg-surface-container-lowest rounded-md p-1 border border-outline-variant/20">
+          <button
+            onClick={() => setViewMode("code")}
+            className={`px-3 py-1.5 rounded text-sm flex items-center gap-1.5 transition-colors ${
+              viewMode === "code"
+                ? "bg-primary-container text-on-primary-container"
+                : "text-on-surface-variant hover:text-on-surface"
+            }`}
+          >
+            <Code2 className="w-4 h-4" /> Code
+          </button>
+          <button
+            onClick={() => setViewMode("whiteboard")}
+            className={`px-3 py-1.5 rounded text-sm flex items-center gap-1.5 transition-colors ${
+              viewMode === "whiteboard"
+                ? "bg-primary-container text-on-primary-container"
+                : "text-on-surface-variant hover:text-on-surface"
+            }`}
+          >
+            <PenLine className="w-4 h-4" /> Whiteboard
+          </button>
+        </div>
+
+      
+        {viewMode === "code" && (
+          <>
+            <LanguageSelector language={language} setLanguage={setLanguage} />
+            <ThemeSelector theme={theme} setTheme={setTheme} />
+          </>
+        )}
+
         <div className="h-6 w-px bg-outline-variant/40 mx-1"></div>
 
-        {/* NEW: Start VC button — only shows when VC hasn't started yet */}
+        
         {!vcActive && (
     <Button onClick={onStartVc} className="gap-2">
       <Video className="w-4 h-4" /> Start VC

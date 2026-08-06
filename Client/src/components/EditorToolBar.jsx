@@ -14,11 +14,11 @@ import { Field, FieldLabel } from './ui/field'
 import { useNavigate } from 'react-router-dom'
 import ThemeSelector from './ThemeSelector'
 import axiosInstance from '@/lib/axios-instance'
-import { ArrowRight, Code2, Share2, Users } from 'lucide-react'
+import { ArrowRight, Code2, Share2, Users, PenLine } from 'lucide-react'
 import { toast } from 'sonner'
 import ShinyText from './ui/shinyText'
 
-const EditorToolBar = ({ language, setLanguage,theme,setTheme }) => {
+const EditorToolBar = ({ language, setLanguage, theme, setTheme, viewMode, setViewMode }) => {
   // inputRef used for get its input value ....and we used it because it did not rerender the compnent
   
   const roomLinkRef = useRef()
@@ -97,15 +97,44 @@ const EditorToolBar = ({ language, setLanguage,theme,setTheme }) => {
       </div>
 
       <div className="flex items-center gap-4">
-        <LanguageSelector
-          language={language}
-          setLanguage={setLanguage}
-        />
-      
-        <ThemeSelector
-          theme={theme}
-          setTheme={setTheme}
-        />
+       
+        <div className="flex items-center bg-surface-container-lowest rounded-md p-1 border border-outline-variant/20">
+          <button
+            onClick={() => setViewMode("code")}
+            className={`px-3 py-1.5 rounded text-sm flex items-center gap-1.5 transition-colors ${
+              viewMode === "code"
+                ? "bg-primary-container text-on-primary-container"
+                : "text-on-surface-variant hover:text-on-surface"
+            }`}
+          >
+            <Code2 className="w-4 h-4" /> Code
+          </button>
+          <button
+            onClick={() => setViewMode("whiteboard")}
+            className={`px-3 py-1.5 rounded text-sm flex items-center gap-1.5 transition-colors ${
+              viewMode === "whiteboard"
+                ? "bg-primary-container text-on-primary-container"
+                : "text-on-surface-variant hover:text-on-surface"
+            }`}
+          >
+            <PenLine className="w-4 h-4" /> Whiteboard
+          </button>
+        </div>
+
+       
+        {viewMode === "code" && (
+          <>
+            <LanguageSelector
+              language={language}
+              setLanguage={setLanguage}
+            />
+
+            <ThemeSelector
+              theme={theme}
+              setTheme={setTheme}
+            />
+          </>
+        )}
         
         {/* <button className="bg-[#00ffaab4] text-black hover:bg-blue-700 px-3 py-1 text-sm rounded">
           Run
