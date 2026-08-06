@@ -27,5 +27,6 @@ public final class  Util {
     public static final long ROOM_TTL_HOURS = 2;
     public static final int MAX_PARTICIPANTS = 10;
     public static final int MAX_RETRY_ATTEMPTS = 3;
+    public static final String ROOM_WHITEBOARD_KEY = "room:whiteboard:";
 
 }

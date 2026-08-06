@@ -1,6 +1,4 @@
 package com.collab.DevHive.Security;
-
-
 import com.collab.DevHive.Entities.User;
 import com.collab.DevHive.Exceptions.ResourceNotFoundException;
 import com.collab.DevHive.Service.UserService;

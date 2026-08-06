@@ -71,6 +71,15 @@ public class RedisMessageSubscriber implements MessageListener {
                 );
                 log.info("Broadcast Room ENDED from redis → /topic/room/{}", eventDTO.getRoomId());
 
+            } else if ("WB_UPDATE".equals(type) ) {
+                WhiteBoardUpdateMessage eventDTO = objectMapper.readValue(json,WhiteBoardUpdateMessage.class);
+
+                messagingTemplate.convertAndSend(
+                        "/topic/room/" + eventDTO.getRoomId(),
+                        eventDTO
+                );
+                log.info("Broadcast whiteBoard update from redis → /topic/room/{}", eventDTO.getRoomId());
+
             } else {
                 log.warn("Unknown message type on Redis channel: {}", type);
             }

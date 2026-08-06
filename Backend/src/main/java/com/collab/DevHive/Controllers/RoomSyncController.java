@@ -3,6 +3,7 @@ package com.collab.DevHive.Controllers;
 import com.collab.DevHive.DTO.CodeUpdateMessage;
 
 import com.collab.DevHive.DTO.LanguageUpdateMessage;
+import com.collab.DevHive.DTO.WhiteBoardUpdateMessage;
 import com.collab.DevHive.Service.RedisService.RedisMessagePublisher;
 import com.collab.DevHive.Service.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +18,12 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.concurrent.TimeUnit;
 
-import static com.collab.DevHive.Util.Util.ROOM_CODE_KEY;
-import static com.collab.DevHive.Util.Util.ROOM_TTL_HOURS;
+import static com.collab.DevHive.Util.Util.*;
 
 @Controller
 @RequiredArgsConstructor
 @Slf4j
-public class CodeSyncController {
+public class RoomSyncController {
 
 
     private final StringRedisTemplate template;
@@ -81,6 +81,23 @@ public class CodeSyncController {
             log.error("Failed to publish language update for room {}: {}", roomId, e.getMessage());
         }
     }
+
+    @MessageMapping("/whiteboard-update/{roomId}")
+    public void handleWhiteboardUpdate(
+            @DestinationVariable String roomId,
+            @Payload WhiteBoardUpdateMessage message
+    ) {
+        // cache only — don't hit DB on every stroke
+        String key = ROOM_WHITEBOARD_KEY + roomId;
+        template.opsForValue().set(key, message.getElements(), ROOM_TTL_HOURS, TimeUnit.HOURS);
+        try {
+            message.setRoomId(roomId);
+            String json = objectMapper.writeValueAsString(message);
+            publisher.publish(json);
+        } catch (Exception e) {
+            log.error("Failed to publish whiteboard update for room {}: {}", roomId, e.getMessage());
+        }
+    }
 }
 
 
@@ -93,7 +110,7 @@ public class CodeSyncController {
 //      ↓
 // app/code-update
 //      ↓
-//CodeSyncController receives it
+//RoomSyncController receives it
 //      ↓
 //updateCode() saves snapshot
 //      ↓

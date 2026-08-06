@@ -24,6 +24,7 @@ public class RoomResponseDto {
     private boolean vcActive;
     private UserDTO owner;
     private boolean ViewerOwner;
+    private String whiteboardElements;
 //    private String ownerUsername;
     private RoomsStatus status;
     private List<ParticipantResponseDto> participants;

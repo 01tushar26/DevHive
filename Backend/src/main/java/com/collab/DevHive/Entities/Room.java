@@ -30,6 +30,10 @@ public class Room {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String whiteboardElements;
+
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 

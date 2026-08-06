@@ -45,7 +45,7 @@ public class LiveKitController {
                 String json = objectMapper.writeValueAsString(event);
                 publisher.publish(json);
             } catch (Exception e) {
-                log.error("Failed to publish language update for room {}: {}", roomId, e.getMessage());
+                log.error("Failed to start vc for room  {}: {}", roomId, e.getMessage());
             }
 
 

@@ -55,6 +55,7 @@ public class RoomServiceImpl implements RoomService{
         newRoom.setStatus(RoomsStatus.ACTIVE);
         newRoom.setCode("// Start coding");
         newRoom.setLanguage("javascript");
+        newRoom.setWhiteboardElements("[]");
         RoomParticipant roomParticipant = new RoomParticipant();
         roomParticipant.setUser(currentUser);
         roomParticipant.setRole(ParticipantsRoles.OWNER);
@@ -70,6 +71,7 @@ public class RoomServiceImpl implements RoomService{
 
                 //put it into redis
                 seedRedis(newRoom.getId(),newRoom.getCode());
+                redisTemplate.opsForValue().set(ROOM_WHITEBOARD_KEY + newRoom.getId(), "[]", ROOM_TTL_HOURS, TimeUnit.HOURS);
                 RoomResponseDto roomResponseDto = mapper.map(newRoom,RoomResponseDto.class);
                 roomResponseDto.setViewerOwner(true);
                 return roomResponseDto;
@@ -107,6 +109,7 @@ public class RoomServiceImpl implements RoomService{
 
         if(participant != null){
             ensureRedisSeeded(roomID,room.getCode());
+            ensureWhiteboardSeeded(roomID,room.getWhiteboardElements());
            RoomResponseDto roomResponseDto = mapper.map(room,RoomResponseDto.class);
            roomResponseDto.setViewerOwner(currentUser.getId().equals(room.getOwner().getId()));
             RoomEventDto eventDto = new RoomEventDto(currentUser.getName(),roomID,"USER_REJOIN");
@@ -143,6 +146,7 @@ public class RoomServiceImpl implements RoomService{
         room = roomRepository.save(room);
 
         ensureRedisSeeded(roomID,room.getCode());
+        ensureWhiteboardSeeded(roomID, room.getWhiteboardElements());
         RoomResponseDto roomResponseDto = mapper.map(room,RoomResponseDto.class);
         roomResponseDto.setViewerOwner(currentUser.getId().equals(room.getOwner().getId()));
 
@@ -160,6 +164,10 @@ public class RoomServiceImpl implements RoomService{
         String liveCode = redisTemplate.opsForValue().get(ROOM_CODE_KEY + roomId);
         if (liveCode != null) {
             room.setCode(liveCode);  // override stale DB code with live Redis value
+        }
+        String liveWhiteboard = redisTemplate.opsForValue().get(ROOM_WHITEBOARD_KEY + roomId);
+        if (liveWhiteboard != null) {
+            room.setWhiteboardElements(liveWhiteboard);
         }
         RoomResponseDto roomResponseDto = mapper.map(room,RoomResponseDto.class);
         roomResponseDto.setViewerOwner(currentUser.getId().equals(room.getOwner().getId()));
@@ -217,10 +225,19 @@ public class RoomServiceImpl implements RoomService{
                     "Redis may have evicted the key or restarted.", roomId);
         }
 
+        String latestWhiteboard = redisTemplate.opsForValue().get(ROOM_WHITEBOARD_KEY + roomId);
+        if (latestWhiteboard != null) {
+            room.setWhiteboardElements(latestWhiteboard);
+        }else {
+            log.warn("Redis miss on room close for room: {} — DB may have stale code. " +
+                    "Redis may have evicted the key or restarted.", roomId);
+        }
+
+
 
         room.setStatus(RoomsStatus.CLOSED);
         room = roomRepository.save(room);
-
+        redisTemplate.delete(ROOM_WHITEBOARD_KEY + roomId);
         redisTemplate.delete(ROOM_CODE_KEY + roomId);
         log.info("Redis key deleted for closed room: {}", roomId);
         //this will delete the livekit vc rooom if exist if not did not give the just give warning in log
@@ -294,6 +311,12 @@ public class RoomServiceImpl implements RoomService{
         if (Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
             redisTemplate.opsForValue().set(key, code, ROOM_TTL_HOURS, TimeUnit.HOURS);
             log.debug("Redis re-seeded after miss for room: {}", roomId);
+        }
+    }
+    private void ensureWhiteboardSeeded(String roomId, String elements) {
+        String key = ROOM_WHITEBOARD_KEY + roomId;
+        if (Boolean.FALSE.equals(redisTemplate.hasKey(key))) {
+            redisTemplate.opsForValue().set(key, elements != null ? elements : "[]", ROOM_TTL_HOURS, TimeUnit.HOURS);
         }
     }
 
