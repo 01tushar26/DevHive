@@ -1,15 +1,18 @@
 # Dev Hive - Interview in real-time, code in sync
 
-DevHive is a live collaborative code editor with built-in video calling. Run mock interviews, pair-program with your team, or grind DSA with friends — all face-to-face in one room.
+DevHive is a live collaborative code editor with built-in video calling and a synced whiteboard. Run mock interviews, pair-program with your team, grind DSA, or practice system design with friends — all face-to-face in one room.
 
-**Live Demo:** 
+**Live Demo:**
 
 <p align="center">
-  <img src="assets/home.png" alt="Learnify Architecture" width="1344"/>
+  <img src="assets/home.png" alt="Devhive Architecture" width="1344"/>
 </p>
 
 <p align="center">
-  <img src="assets/editor.png" alt="Learnify Architecture" width="1672"/>
+  <img src="assets/editor.png" alt="Devhive Architecture" width="1672"/>
+</p>
+<p align="center">
+  <img src="assets/whiteboard.png" alt="Devhive Architecture" width="1672"/>
 </p>
 
 ---
@@ -34,6 +37,7 @@ DevHive is a live collaborative code editor with built-in video calling. Run moc
 - **Cache-Aside Fallback** — graceful handling and logging of Redis cache misses with DB fallback
 - **Global Exception Handling** — custom exceptions (`ResourceNotFoundException`, `RoomNotAvailableException`, `AccessDeniedException`) for consistent error responses
 - **Modular Service Architecture** — clean separation across Room, User, LiveKit, and Redis services
+- **Collaborative Whiteboard** — Excalidraw-powered whiteboard for practicing system design, synced live across room participants over WebSocket
 
 
 ---
@@ -46,6 +50,7 @@ DevHive is a live collaborative code editor with built-in video calling. Run moc
 |---|---|
 | Frontend | React, Vite, TailwindCSS |
 | Code Editor | Monaco Editor (`@monaco-editor/react`) |
+| Whiteboard | Excalidraw (`@excalidraw/excalidraw`) |
 | WebSocket Client | SockJS + STOMP.js (`@stomp/stompjs`) |
 | Video Calling | WebRTC (SFU topology) via LiveKit |
 | Backend | Spring Boot |
@@ -56,10 +61,11 @@ DevHive is a live collaborative code editor with built-in video calling. Run moc
  
 ---
 
-## Architecture
+[//]: # (## Architecture)
 
-
----
+[//]: # ()
+[//]: # ()
+[//]: # (---)
 
 
 
@@ -94,7 +100,8 @@ DevHive is a live collaborative code editor with built-in video calling. Run moc
 |-----------|-------------|--------------|
 | Client → Server | `/app/code-update/{roomId}` | Send a code change; cached in Redis (`ROOM_CODE_KEY`, TTL via `ROOM_TTL_HOURS`) and republished |
 | Client → Server | `/app/lang-update/{roomId}` | Change the room's active language; persisted via `RoomService.langUpdate` and republished |
-| Server → Client | `/topic/room/{roomId}` | Receive code updates, language updates, join/leave events, video call events, room-end signal |
+| Client → Server | `/app/whiteboard-update/{roomId}` | Send whiteboard element/scene updates; broadcast live to all room participants for real-time system design sketching |
+| Server → Client | `/topic/room/{roomId}` | Receive code updates, language updates, whiteboard updates, join/leave events, video call events, room-end signal |
 
 ---
 
@@ -107,8 +114,9 @@ DevHive is a live collaborative code editor with built-in video calling. Run moc
 
 ---
 
-## Running Locally
+[//]: # (## Running Locally)
 
-
-
----
+[//]: # ()
+[//]: # ()
+[//]: # ()
+[//]: # (---)
