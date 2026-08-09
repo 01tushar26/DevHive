@@ -25,10 +25,14 @@ const RoomPage = () => {
     const [inCall, setInCall] = useState(false);
     const justStartedVc = useRef(false);
     const [viewMode, setViewMode] = useState("code"); // "code" | "whiteboard"
-const [whiteboardElements, setWhiteboardElements] = useState([]);
-const excalidrawAPIRef = useRef(null);
-const isRemoteWhiteboardUpdate = useRef(false);
-const wbDebounceRef = useRef(null);
+    const [whiteboardElements, setWhiteboardElements] = useState([]);
+    const excalidrawAPIRef = useRef(null);
+    const wbDebounceRef = useRef(null);
+    // tracks the exact JSON string of the last whiteboard payload WE sent —
+    // lets us recognize the server broadcasting our own update back to us
+    // (STOMP's simple broker doesn't exclude the sender) and drop it before
+    // it ever reaches state, instead of relying on timing-based flags.
+    const lastSentWhiteboardRef = useRef("");
 
 
     const {roomId } = useParams()
@@ -98,9 +102,13 @@ const wbDebounceRef = useRef(null);
         setCode(data.code);
     }
     else if (data.message === "WB_UPDATE") {
-  isRemoteWhiteboardUpdate.current = true;
-  setWhiteboardElements(JSON.parse(data.elements));
-}
+      // if this is exactly what we just sent, it's our own broadcast
+      // echoing back — ignore it, don't touch state, don't re-apply it
+      if (data.elements === lastSentWhiteboardRef.current) {
+        return;
+      }
+      setWhiteboardElements(JSON.parse(data.elements));
+    }
     else if(data.message =="LANG_UPDATE"){
       
       isRemoteLanguageUpdate.current=true;
@@ -139,12 +147,14 @@ const wbDebounceRef = useRef(null);
   };
 
   const handleWhiteboardChange = (newElements) => {
-  setWhiteboardElements(newElements);
-  clearTimeout(wbDebounceRef.current);
-  wbDebounceRef.current = setTimeout(() => {
-    sendWhiteboardUpdate(roomId, newElements);
-  }, 300);
-};
+    setWhiteboardElements(newElements);
+    clearTimeout(wbDebounceRef.current);
+    wbDebounceRef.current = setTimeout(() => {
+      const serialized = JSON.stringify(newElements);
+      lastSentWhiteboardRef.current = serialized; // record before sending
+      sendWhiteboardUpdate(roomId, newElements);
+    }, 300);
+  };
 
   const handlelanguageChange = (newLang) => {
     if (isRemoteLanguageUpdate.current) {

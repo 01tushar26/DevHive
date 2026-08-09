@@ -56,6 +56,14 @@ const bentoFeatures = [
     title: "Multi-Language",
     body: "Switch between JavaScript, Python, C++, and more instantly with full syntax highlighting.",
   },
+  {
+    span: "md:col-span-4",
+    bg: "bg-surface-container-high",
+    icon: Pen,
+    iconColor: "text-primary-container",
+    title: "Integrated Synced Whiteboard",
+    body: "A shared whiteboard built into every room, synced in real time alongside the editor. Sketch out a system design, explain how a service talks to a database, teach a DSA concept with diagrams, or walk your interviewer through the flow of your project — all without ever leaving the call.",
+  },
 ];
 
 const pipelineItems = [
@@ -65,13 +73,6 @@ const pipelineItems = [
     bg: "bg-primary-container/10",
     title: "Real Code Execution",
     body: "Run your code directly in the hive. No more read-only interviews, see if the solution actually passes.",
-  },
- {
-    icon: Pen,
-    color: "text-secondary",
-    bg: "bg-secondary/10",
-    title: "Whiteboard for System Design",
-    body: "A shared Excalidraw-style canvas alongside the editor, so system-design rounds aren't stuck in code — sketch architecture, draw boxes and arrows, live with your interviewer.",
   },
 ];
 
@@ -154,8 +155,7 @@ export default function Home() {
               className="text-xl md:text-2xl text-on-surface-variant font-body max-w-2xl mx-auto mb-12 leading-relaxed"
             >
               
-             DevHive is a live collaborative code editor with built-in video calling — run mock interviews,
-            pair-program with your team, or grind DSA with friends, all face-to-face in one room.
+            DevHive is a live collaborative code editor with built-in video calling and a synced whiteboard — run mock interviews, pair-program with your team, sketch out a system design, or grind DSA with friends, all face-to-face in one room.
             </motion.p>
             <motion.div
               custom={3}
