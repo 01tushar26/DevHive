@@ -10,6 +10,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.collab.DevHive.Util.Util.ROOM_CODE_KEY;
+import static com.collab.DevHive.Util.Util.ROOM_WHITEBOARD_KEY;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -22,8 +25,16 @@ public class RoomSyncScheduler {
     @Scheduled(fixedRate = 30_000)
     @Transactional
     public void syncActiveRoomsToDb() {
+
+        syncCode();
+        syncWhiteboard();
+
+
+    }
+
+    private void syncCode() {
         //yolo consistency
-        ScanOptions options = ScanOptions.scanOptions().match("room:*").count(100).build();
+        ScanOptions options = ScanOptions.scanOptions().match(ROOM_CODE_KEY+ "*").count(100).build();
 
         try (Cursor<byte[]> cursor = redisTemplate.getConnectionFactory()
                 .getConnection()
@@ -32,9 +43,9 @@ public class RoomSyncScheduler {
             while (cursor.hasNext()) {
                 String key = new String(cursor.next());
 
-                if (key.contains("::")) continue;
 
-                String roomId = key.replace("room:", "");
+
+                String roomId = key.replace(ROOM_CODE_KEY, "");
                 String code = redisTemplate.opsForValue().get(key);
 
                 if (code == null) continue;
@@ -47,9 +58,38 @@ public class RoomSyncScheduler {
                     }
                 });
             }
-        }
-         catch (Exception e) {
+        } catch (Exception e) {
             log.error("Sync failed: {}", e.getMessage());
         }
     }
+
+    private void syncWhiteboard(){
+
+        ScanOptions options = ScanOptions.scanOptions().match(ROOM_WHITEBOARD_KEY + "*").count(100).build();
+
+        try (Cursor<byte[]> cursor = redisTemplate.getConnectionFactory()
+                .getConnection()
+                .scan(options)) {
+
+            while (cursor.hasNext()) {
+                String key = new String(cursor.next());
+                String roomId = key.replace(ROOM_WHITEBOARD_KEY, "");
+                String elements = redisTemplate.opsForValue().get(key);
+
+                if (elements == null) continue;
+
+                roomRepository.findById(roomId).ifPresent(room -> {
+                    if (!elements.equals(room.getWhiteboardElements())) {
+                        room.setWhiteboardElements(elements);
+                        roomRepository.save(room);
+                        log.info("Synced whiteboard for room {}", roomId);
+                    }
+                });
+            }
+        } catch (Exception e) {
+            log.error("Whiteboard sync failed: {}", e.getMessage());
+        }
+
+    }
 }
+

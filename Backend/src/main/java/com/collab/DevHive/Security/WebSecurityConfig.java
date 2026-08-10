@@ -3,6 +3,7 @@ package com.collab.DevHive.Security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -28,6 +29,9 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
     private final JWTAuthFilter jwtAuthFilter;
+
+    @Value("${app.cors.allowed-origins}")
+    private String[] allowedOrigins;
 
     @Autowired
     @Qualifier("handlerExceptionResolver")
@@ -61,7 +65,7 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173")); // your React dev server
+        config.setAllowedOrigins(List.of(allowedOrigins)); // your React dev server
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
