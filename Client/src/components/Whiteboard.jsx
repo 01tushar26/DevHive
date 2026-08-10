@@ -79,22 +79,23 @@ const Whiteboard = ({ elements, onLocalChange, excalidrawAPIRef }) => {
   }
 `}</style>
 
-      <Excalidraw
-        excalidrawAPI={(api) => (excalidrawAPIRef.current = api)}
-        onChange={handleChange}
-        theme="dark"
-        UIOptions={{
-          canvasActions: {
-            loadScene: false,
-            export: false,
-            saveToActiveFile: false,
-            saveAsImage: false,
-            toggleTheme: false,
-            clearCanvas: true,
-            changeViewBackgroundColor: true,
-          },
-        }}
-      >
+     <Excalidraw
+  excalidrawAPI={(api) => (excalidrawAPIRef.current = api)}
+  onChange={handleChange}
+  initialData={{ elements: elements || [], appState: { theme: "dark" } }}
+  theme="dark"
+  UIOptions={{
+    canvasActions: {
+      loadScene: false,
+      export: false,
+      saveToActiveFile: false,
+      saveAsImage: false,
+      toggleTheme: false,
+      clearCanvas: true,
+      changeViewBackgroundColor: true,
+    },
+  }}
+>
     
         <MainMenu></MainMenu>
       </Excalidraw>
