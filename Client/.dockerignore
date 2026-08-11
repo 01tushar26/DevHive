@@ -1,0 +1,43 @@
+# dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# build output
+dist
+dist-ssr
+build
+
+# env files (never bake secrets/urls into the image)
+.env
+.env.*
+!.env.example
+
+# version control
+.git
+.gitignore
+
+# editor/OS junk
+.vscode
+.idea
+*.swp
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+logs
+
+# test/coverage
+coverage
+.nyc_output
+
+# docker itself
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# misc
+README.md
+*.md

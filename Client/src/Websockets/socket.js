@@ -3,9 +3,10 @@ import { Client } from "@stomp/stompjs"
 import { toast } from "sonner";
 
 let stompClient = null;
+const apiUrl = import.meta.env.VITE_BACKEND_URL;
 
 export const connectSocket = (roomId, onMessageReceived) => {
-  const socket = new SockJS("http://localhost:8080/api/v1/ws");
+  const socket = new SockJS(`${apiUrl}/ws`); // Connect to the WebSocket endpoint
   
 
   stompClient = new Client({

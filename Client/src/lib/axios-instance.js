@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { toast } from 'sonner';
 
+const apiUrl = import.meta.env.VITE_BACKEND_URL;
 
 //todo-add the url in env
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8080/api/v1",
+  baseURL: apiUrl,
   withCredentials: true, // sends the refreshToken HttpOnly cookie automatically
 });
 

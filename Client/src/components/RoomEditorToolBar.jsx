@@ -43,7 +43,7 @@ const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onS
     }
   }
 
-  const link = `http://localhost:5173/room/${roomId}/join`;
+  const link = `${import.meta.env.VITE_CLIENT_URL}/room/${roomId}/join`;
 
   function copyCode() {
     navigator.clipboard.writeText(link).then(() => {
