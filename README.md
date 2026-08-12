@@ -38,6 +38,9 @@ DevHive is a live collaborative code editor with built-in video calling and a sy
 - **Global Exception Handling** — custom exceptions (`ResourceNotFoundException`, `RoomNotAvailableException`, `AccessDeniedException`) for consistent error responses
 - **Modular Service Architecture** — clean separation across Room, User, LiveKit, and Redis services
 - **Collaborative Whiteboard** — Excalidraw-powered whiteboard for practicing system design, synced live across room participants over WebSocket
+- **Multi-Stage Docker Builds** — lean production images via multi-stage builds (Node build stage → Nginx runtime stage for the frontend), keeping build tooling and `node_modules` out of the final image
+- **Nginx Static File Serving** — frontend static assets served by Nginx with SPA fallback routing (`try_files`), production-ready and container-friendly
+- **Fully Containerized Stack** — Docker Compose orchestrates frontend, backend, PostgreSQL, and Redis as isolated, restart-safe services for one-command local setup
 
 
 ---
@@ -58,6 +61,8 @@ DevHive is a live collaborative code editor with built-in video calling and a sy
 | Cache / Pub-Sub | Redis |
 | Database | PostgreSQL (Spring Data JPA) |
 | Auth | JWT + Refresh Token (HttpOnly Cookie) |
+| Containerization | Docker (multi-stage builds), Docker Compose |
+| Web Server | Nginx (static file serving + SPA routing for the frontend) |
  
 ---
 
@@ -114,9 +119,52 @@ DevHive is a live collaborative code editor with built-in video calling and a sy
 
 ---
 
-[//]: # (## Running Locally)
+## Running Locally
 
-[//]: # ()
-[//]: # ()
-[//]: # ()
-[//]: # (---)
+> Requires **Docker** and **Docker Compose** to be installed.
+
+1. **Create the `.env` file**
+
+   ```bash
+   cp example.env .env
+   ```
+
+   Fill in the following variables:
+
+   | Variable | Description |
+      |---|---|
+   | `DB_USERNAME` | PostgreSQL username |
+   | `LOCALDB_PASS` | PostgreSQL password |
+   | `REDIS_HOST` | Redis hostname (use `redis` when running via Compose) |
+   | `REDIS_PASS` | Redis password |
+   | `JWT_SECRETKEY` | Secret key used to sign JWT tokens |
+   | `LIVEKIT_URL` | LiveKit server/cloud URL |
+   | `LIVEKIT_API_KEY` | LiveKit API key |
+   | `LIVEKIT_API_SECRET` | LiveKit API secret |
+
+2. **Build the backend image**
+
+   ```bash
+   cd Server
+   docker build -t devhive:latest .
+   cd ..
+   ```
+
+3. **Run the stack**
+
+   ```bash
+   docker-compose -f docker-compose.dev.yml up -d --build
+   ```
+
+4. **Access the app**
+
+    - Frontend: http://localhost:5173
+    - Backend: http://localhost:8080/api/v1
+
+Stop everything with:
+
+```bash
+docker-compose -f docker-compose.dev.yml down
+```
+
+---
