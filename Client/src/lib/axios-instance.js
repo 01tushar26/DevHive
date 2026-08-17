@@ -60,7 +60,7 @@ axiosInstance.interceptors.response.use(
         localStorage.removeItem('accessToken');
         toast.error("Please login first !!")
 
-         setTimeout(() =>  window.location.href = 'http://localhost:5173/login', 1100)
+         setTimeout(() =>  window.location.href = `${import.meta.env.VITE_CLIENT_URL}/login`, 1100)
        
          return new Promise(() => {})
       }
