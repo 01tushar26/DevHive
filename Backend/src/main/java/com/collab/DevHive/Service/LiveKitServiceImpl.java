@@ -96,7 +96,7 @@ public class LiveKitServiceImpl implements LiveKitService {
         token.setExpiration(Date.from(Instant.now().plus(Duration.ofHours(2))));
 
         String jwt = token.toJwt();
-        String wsURL = serverUrl.replaceFirst("https","ws");
+        String wsURL = serverUrl.replaceFirst("https","wss");
         return new JoinVideoCallResponseDTO(wsURL,jwt);
     }
 
