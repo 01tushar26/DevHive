@@ -2,7 +2,7 @@
 
 DevHive is a live collaborative code editor with built-in video calling and a synced whiteboard. Run mock interviews, pair-program with your team, grind DSA, or practice system design with friends — all face-to-face in one room.
 
-**Live Demo:**
+**Live Demo:** http://devhive.tushardev.me
 
 <p align="center">
   <img src="assets/home.png" alt="Devhive Architecture" width="1344"/>
