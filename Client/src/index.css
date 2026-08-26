@@ -6,12 +6,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
-  DevHive is a single always-dark brand, not a light/dark toggle,
-  so both :root and .dark resolve to the same neon palette. This keeps
-  every other shadcn component (buttons, inputs, cards on other pages)
-  working with the same semantic names, just recolored to match the brand.
-*/
 :root,
 .dark {
     --background: #0e0e0e;
