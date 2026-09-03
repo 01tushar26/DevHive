@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
     paths:
       - 'Backend/**'
-      - '.github/workflows/ci-cd.yml'
+      - '.github/workflows/cicd_backend.yml'
       - 'docker-compose.prod.yml'
 
 
