@@ -41,6 +41,9 @@ DevHive is a live collaborative code editor with built-in video calling and a sy
 - **Multi-Stage Docker Builds** — lean production images via multi-stage builds (Node build stage → Nginx runtime stage for the frontend), keeping build tooling and `node_modules` out of the final image
 - **Nginx Static File Serving** — frontend static assets served by Nginx with SPA fallback routing (`try_files`), production-ready and container-friendly
 - **Fully Containerized Stack** — Docker Compose orchestrates frontend, backend, PostgreSQL, and Redis as isolated, restart-safe services for one-command local setup
+- **Production Deployment on AWS EC2** — full stack deployed on an AWS EC2 instance, running as containerized services in production
+- **Nginx Reverse Proxy** — Nginx sits in front of the deployed app, routing traffic to the frontend and backend services and handling SSL/TLS termination
+- **CI/CD with GitHub Actions** — automated build, test, and deployment pipeline that ships changes to the EC2 instance on every push, removing manual deployment steps
 
 
 ---
@@ -62,7 +65,9 @@ DevHive is a live collaborative code editor with built-in video calling and a sy
 | Database | PostgreSQL (Spring Data JPA) |
 | Auth | JWT + Refresh Token (HttpOnly Cookie) |
 | Containerization | Docker (multi-stage builds), Docker Compose |
-| Web Server | Nginx (static file serving + SPA routing for the frontend) |
+| Web Server | Nginx (static file serving + SPA routing for the frontend, reverse proxy in production) |
+| Cloud / Hosting | AWS EC2 |
+| CI/CD | GitHub Actions |
  
 ---
 
@@ -132,7 +137,7 @@ DevHive is a live collaborative code editor with built-in video calling and a sy
    Fill in the following variables:
 
    | Variable | Description |
-      |---|---|
+         |---|---|
    | `DB_USERNAME` | PostgreSQL username |
    | `LOCALDB_PASS` | PostgreSQL password |
    | `REDIS_HOST` | Redis hostname (use `redis` when running via Compose) |
@@ -158,8 +163,8 @@ DevHive is a live collaborative code editor with built-in video calling and a sy
 
 4. **Access the app**
 
-    - Frontend: http://localhost:5173
-    - Backend: http://localhost:8080/api/v1
+   - Frontend: http://localhost:5173
+   - Backend: http://localhost:8080/api/v1
 
 Stop everything with:
 
