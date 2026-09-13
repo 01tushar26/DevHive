@@ -253,7 +253,7 @@ export default function Home() {
 </p>
               </div>
               <div className="w-full md:w-48 h-32 bg-surface-container rounded-lg border border-outline-variant/20 flex items-center justify-center">
-                <span className="text-primary-container font-mono text-sm">devhive.io/x8-k2p</span>
+                <span className="text-primary-container font-mono text-sm">devhive.tushardev.me/3sdv34</span>
               </div>
             </div>
           </div>
