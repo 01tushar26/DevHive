@@ -1,56 +1,86 @@
-import React, { useRef } from 'react'
+import React, { useState } from 'react'
 import LanguageSelector from './LanguageSelector'
 import ThemeSelector from './ThemeSelector'
-import { Code2, Copy, Link2, LogOut, Users, Video, PenLine } from 'lucide-react'
+import { Code2, Copy, Link2, LogOut, Users, Video, PenLine, Loader2 } from 'lucide-react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
 import { Button } from './ui/button'
 import { Field, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
 import axiosInstance from '@/lib/axios-instance'
+import { getErrorMessage } from '@/lib/get-error-message'
 import { toast } from 'sonner'
 import ShinyText from './ui/shinyText'
 import { useNavigate } from 'react-router-dom'
 
+const RoomEditorToolBar = ({
+  language,
+  setLanguage,
+  roomId,
+  theme,
+  setTheme,
+  onStartVc,
+  vcActive,
+  inCall,
+  onJoinVc,
+  startingVc,
+  joiningVc,
+  isOwner,
+  viewMode,
+  setViewMode,
+}) => {
+  const navigate = useNavigate()
+  const [ending, setEnding] = useState(false)
+  const [leaving, setLeaving] = useState(false)
 
-const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onStartVc, vcActive, inCall, onJoinVc, isOwner, viewMode, setViewMode }) => {
-
-   const navigate = useNavigate()
+  const exiting = ending || leaving
 
   async function deleteRoom() {
+    if (exiting) return
     try {
-      await axiosInstance.delete(`/rooms/${roomId}/end`);
-      toast.success(`Room with id ${roomId} deleted successfully`)
+      setEnding(true)
+      await axiosInstance.delete(`/rooms/${roomId}/end`)
+      toast.success("Session ended", {
+        description: `Room ${roomId} was closed successfully.`,
+      })
+      // stay locked: the ROOM_ENDED socket message redirects the host
     } catch (error) {
-      const message =
-        error.response?.data?.error?.message ||
-        error.response?.data?.data?.message ||
-        "Failed to delete room"
-      toast.error(message);
+      toast.error("Failed to end session", {
+        description: getErrorMessage(error),
+      })
+      setEnding(false)
     }
   }
+
   async function leaveRoom() {
+    if (exiting) return
     try {
-      await axiosInstance.delete(`/rooms/${roomId}/leave`);
+      setLeaving(true)
+      await axiosInstance.delete(`/rooms/${roomId}/leave`)
       toast.success("You left the room")
-       navigate("/editor")
-
+      navigate("/editor")
     } catch (error) {
-      const message =
-        error.response?.data?.error?.message ||
-        error.response?.data?.data?.message ||
-        "Failed to leave room"
-      toast.error(message);
+      toast.error("Failed to leave room", {
+        description: getErrorMessage(error),
+      })
+      setLeaving(false)
     }
   }
 
-  const link = `${import.meta.env.VITE_CLIENT_URL}/room/${roomId}/join`;
+  const link = `${import.meta.env.VITE_CLIENT_URL}/room/${roomId}/join`
 
   function copyCode() {
-    navigator.clipboard.writeText(link).then(() => {
-      toast.success("Code copied to clipboard!");
-    }).catch(err => {
-      toast.error('Failed to copy code: ');
-    });
+    navigator.clipboard
+      .writeText(link)
+      .then(() => {
+        toast.success("Link copied", {
+          description: "Invite link copied to clipboard.",
+        })
+      })
+      .catch(() => {
+        toast.error("Failed to copy link", {
+          description: "Please copy it manually from the field.",
+        })
+      })
   }
 
   return (
@@ -80,7 +110,6 @@ const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onS
       </div>
 
       <div className="flex items-center gap-4">
-    
         <div className="flex items-center bg-surface-container-lowest rounded-md p-1 border border-outline-variant/20">
           <button
             onClick={() => setViewMode("code")}
@@ -104,7 +133,6 @@ const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onS
           </button>
         </div>
 
-      
         {viewMode === "code" && (
           <>
             <LanguageSelector language={language} setLanguage={setLanguage} />
@@ -114,17 +142,32 @@ const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onS
 
         <div className="h-6 w-px bg-outline-variant/40 mx-1"></div>
 
-        
         {!vcActive && (
-    <Button onClick={onStartVc} className="gap-2">
-      <Video className="w-4 h-4" /> Start VC
-    </Button>
-  )}
-  {vcActive && !inCall && (
-    <Button onClick={onJoinVc} className="gap-2">
-      <Video className="w-4 h-4" /> Join Call
-    </Button>
-  )}
+          <Button onClick={onStartVc} disabled={startingVc} className="gap-2">
+            {startingVc ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> Starting…
+              </>
+            ) : (
+              <>
+                <Video className="w-4 h-4" /> Start VC
+              </>
+            )}
+          </Button>
+        )}
+        {vcActive && !inCall && (
+          <Button onClick={onJoinVc} disabled={joiningVc} className="gap-2">
+            {joiningVc ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> Joining…
+              </>
+            ) : (
+              <>
+                <Video className="w-4 h-4" /> Join Call
+              </>
+            )}
+          </Button>
+        )}
 
         <Dialog>
           <DialogTrigger asChild>
@@ -141,9 +184,7 @@ const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onS
                 <div className="w-3 h-3 rounded-full bg-primary-container/30" />
                 <div className="w-3 h-3 rounded-full bg-secondary/30" />
               </div>
-              <div className="text-xs font-label text-on-surface-variant tracking-widest">
-                DevHive
-              </div>
+              <div className="text-xs font-label text-on-surface-variant tracking-widest">DevHive</div>
               <div className="w-12" />
             </div>
 
@@ -176,7 +217,7 @@ const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onS
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-primary-container/60 animate-pulse" />
                 </div>
 
-                <Button onClick={() => copyCode()} size="xl" className="w-full rounded-full gap-2">
+                <Button onClick={copyCode} size="xl" className="w-full rounded-full gap-2">
                   <Copy className="w-4 h-4" />
                   Copy Link
                 </Button>
@@ -185,22 +226,41 @@ const RoomEditorToolBar = ({ language, setLanguage, roomId, theme, setTheme, onS
           </DialogContent>
         </Dialog>
 
-        {isOwner?<Button
-          onClick={() => deleteRoom()}
-          variant="destructive"
-          className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 transition-colors gap-2"
-        >
-          <LogOut className="w-4 h-4" />
-          End Session
-        </Button>
-        :<Button
-          onClick={() => leaveRoom()}
-          variant="destructive"
-          className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 transition-colors gap-2"
-        >
-          <LogOut className="w-4 h-4" />
-          Leave Session
-        </Button>}
+        {isOwner ? (
+          <Button
+            onClick={deleteRoom}
+            disabled={exiting}
+            variant="destructive"
+            className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 transition-colors gap-2"
+          >
+            {ending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> Ending…
+              </>
+            ) : (
+              <>
+                <LogOut className="w-4 h-4" /> End Session
+              </>
+            )}
+          </Button>
+        ) : (
+          <Button
+            onClick={leaveRoom}
+            disabled={exiting}
+            variant="destructive"
+            className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/20 transition-colors gap-2"
+          >
+            {leaving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" /> Leaving…
+              </>
+            ) : (
+              <>
+                <LogOut className="w-4 h-4" /> Leave Session
+              </>
+            )}
+          </Button>
+        )}
       </div>
     </div>
   )

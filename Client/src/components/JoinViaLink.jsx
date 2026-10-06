@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Link2, ArrowRight } from "lucide-react";
+import { Link2, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,26 +11,23 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { useNavigate } from "react-router-dom";
 import { Input } from "@base-ui/react";
 
 import { toast } from "sonner";
 
 export function JoinViaLink() {
-
-    const linkRef = useRef();
-     
-  const navigate = useNavigate();
+  const linkRef = useRef();
+  const [joining, setJoining] = useState(false);
 
   const handleJoin = () => {
-    if(!linkRef.current || linkRef.current.value==""){
-        toast.error("Link is required")
-        return;
-     }
-     window.location.href = linkRef.current.value;
-    // TODO: parse room id / validate link, then navigate
-    // e.g. const roomId = link.split("/").pop();
-    
+    if (joining) return;
+
+    if (!linkRef.current || linkRef.current.value === "") {
+      toast.error("Link is required");
+      return;
+    }
+    setJoining(true);
+    window.location.href = linkRef.current.value;
   };
 
   return (
@@ -42,16 +39,13 @@ export function JoinViaLink() {
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-md bg-surface-container-low border border-outline-variant/10 rounded-xl shadow-2xl overflow-hidden p-0 gap-0">
-        {/* Fake window chrome, echoing the editor mockup */}
         <div className="flex items-center justify-between px-4 py-3 bg-surface-container-high">
           <div className="flex gap-2">
             <div className="w-3 h-3 rounded-full bg-error/30" />
             <div className="w-3 h-3 rounded-full bg-primary-container/30" />
             <div className="w-3 h-3 rounded-full bg-secondary/30" />
           </div>
-          <div className="text-xs font-label text-on-surface-variant  tracking-widest">
-            DevHive
-          </div>
+          <div className="text-xs font-label text-on-surface-variant  tracking-widest">DevHive</div>
           <div className="w-12" />
         </div>
 
@@ -78,27 +72,28 @@ export function JoinViaLink() {
               Invite link
             </Label>
             <div className="relative">
-              {/* <input
+              <Input
+                ref={linkRef}
                 id="join-link"
-                value={link}
-                onChange={(e) => setLink(e.target.value)}
-                placeholder="devhive.io/x8-k2p"
-                
-              /> */}
-               <Input
-            ref={linkRef}
-            id="join-link"
-            type="text"
-            
-            className="w-full bg-surface-container rounded-lg border border-outline-variant/20 px-4 py-3 font-mono text-sm text-on-surface placeholder:text-outline focus:outline-none focus:ring-1 focus:ring-primary-container/50 focus:border-primary-container/50 transition-all"
-          />
+                type="text"
+                disabled={joining}
+                className="w-full bg-surface-container rounded-lg border border-outline-variant/20 px-4 py-3 font-mono text-sm text-on-surface placeholder:text-outline focus:outline-none focus:ring-1 focus:ring-primary-container/50 focus:border-primary-container/50 transition-all"
+              />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-primary-container/60 animate-pulse" />
             </div>
           </div>
 
           <DialogFooter>
-            <Button size="xl" className="w-full gap-2" onClick={handleJoin}>
-              Enter Hive <ArrowRight size={18} />
+            <Button size="xl" className="w-full gap-2" onClick={handleJoin} disabled={joining}>
+              {joining ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Entering…
+                </>
+              ) : (
+                <>
+                  Enter Hive <ArrowRight size={18} />
+                </>
+              )}
             </Button>
           </DialogFooter>
         </div>

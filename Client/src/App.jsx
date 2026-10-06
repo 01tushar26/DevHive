@@ -8,6 +8,7 @@ import JoinPage from './page/join-page'
 import Login from './page/login'
 import SignUp from './page/signup-page'
 import Home from './page/home'
+import { Toaster } from 'sonner'
 
 function App() {
   
@@ -24,6 +25,7 @@ function App() {
 
      </Routes>
     </BrowserRouter>
+    <Toaster theme="dark" richColors position="top-right" />
       
     </>
   )
