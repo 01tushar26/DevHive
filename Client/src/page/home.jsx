@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   SquareTerminal,
   Users,
@@ -21,6 +22,7 @@ import { cn } from "@/lib/utils";
 import DecryptedText from "@/components/DecryptedText";
 import { useNavigate } from "react-router-dom";
 import { JoinViaLink } from "@/components/JoinViaLink";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 
 
@@ -97,6 +99,7 @@ export default function Home() {
   const shouldReduceMotion = useReducedMotion();
   const initial = shouldReduceMotion ? "show" : "hidden";
   const navigate = useNavigate();
+  const [demoOpen, setDemoOpen] = useState(false);
 
   return (
     <div className="bg-background text-on-surface selection:bg-primary-container selection:text-on-primary-container overflow-x-hidden">
@@ -110,7 +113,7 @@ export default function Home() {
             </span>
           </div>
          
-          <Button variant="default" size="sm" onClick={()=>navigate("/signup")}>
+          <Button className="text-black" variant="default" size="sm" onClick={()=>navigate("/signup")}>
             Sign Up
           </Button>
         </div>
@@ -164,7 +167,7 @@ export default function Home() {
               variants={heroItem}
               className="flex flex-col sm:flex-row gap-6 justify-center items-center"
             >
-              <Button size="xl" onClick={() => navigate("/editor")}>Get Started</Button>
+              <Button className="text-black" size="xl" onClick={() => navigate("/editor")}>Get Started</Button>
 
               {/* <Button variant="outline" size="xl">
                 Join via Link
@@ -308,8 +311,13 @@ export default function Home() {
            Interviews, pair sessions, study groups — start a room and share the link.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button size="xl" onClick={()=>navigate("/editor")}>Get Started Free</Button>
-            <Button variant="outline" size="xl" className="bg-surface-container-highest hover:bg-surface-bright">
+            <Button className="text-black" size="xl" onClick={()=>navigate("/editor")}>Enter into Hive</Button>
+            <Button
+              variant="outline"
+              size="xl"
+              onClick={() => setDemoOpen(true)}
+              className="bg-surface-container-highest hover:bg-surface-bright"
+            >
               View Demo
             </Button>
           </div>
@@ -353,6 +361,27 @@ export default function Home() {
 
   </div>
 </footer>
+
+      {/* Demo video modal */}
+      <Dialog open={demoOpen} onOpenChange={setDemoOpen}>
+        <DialogContent
+          showCloseButton
+          className="sm:max-w-5xl w-[95vw] p-0 overflow-hidden bg-black border border-outline-variant/10 rounded-2xl shadow-2xl"
+        >
+          <DialogTitle className="sr-only">DevHive demo</DialogTitle>
+          <DialogDescription className="sr-only">
+            A short video showing how DevHive works.
+          </DialogDescription>
+          <video
+            src="/devhive-intro.mp4"
+            className="w-full aspect-video"
+            controls
+            autoPlay
+            playsInline
+            preload="none"
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
