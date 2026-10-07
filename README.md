@@ -5,14 +5,7 @@ DevHive is a live collaborative code editor with built-in video calling and a sy
 **Live Demo:** [devhive.tushardev.me](https://devhive.tushardev.me)
 
 <p align="center">
-  <img src="assets/home.png" alt="Devhive Architecture" width="1344"/>
-</p>
-
-<p align="center">
-  <img src="assets/editor.png" alt="Devhive Architecture" width="1672"/>
-</p>
-<p align="center">
-  <img src="assets/whiteboard.png" alt="Devhive Architecture" width="1672"/>
+    <img src="assets/devhive-intro.gif" alt="DevHive intro – click to watch with sound" width="800"/>
 </p>
 
 ---
